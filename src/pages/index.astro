@@ -25,7 +25,7 @@ const google_link = generateGoogleOAuthURL({
 	redirectUri: urls.auth_redirect
 });
 
-const list = await (Astro.locals.runtime.env.User as unknown as UserService).list()
+// const list = await (Astro.locals.runtime.env.User as unknown as UserService).list();
 
 ---
 <script is:inline define:vars={{url: urls.socket_server}}>
@@ -53,7 +53,7 @@ OAuth2 login -
 <a
 	href={google_link}
 >Google Login</a>
-<p>Registered users list:</p>
+<!-- <p>Registered users list:</p>
 <p>
 	{
 		list.map((item) => (
@@ -66,7 +66,7 @@ OAuth2 login -
 			</div>
 		))
 	}
-</p>
+</p> -->
 </div>
 <div>
 	<h2>Chat</h2>

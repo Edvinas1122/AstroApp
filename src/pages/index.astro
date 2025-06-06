@@ -1,16 +1,36 @@
 ---
 import {generateGoogleOAuthURL} from "../utils/oAuth";
 import type { UserService } from "../../../api/src";
+
 export const prerender = false;
+
+const developement = Astro.locals.runtime.env.DEV === 'true'
+
+const fetch_urls = {
+	dev: {
+		auth_redirect: "https://dev.edvinas.online/auth/callback",
+		socket_server: "wss://socket.edvinas.online",
+	},
+	prod: {
+		auth_redirect: "https://journal.edvinasmomkus.workers.dev/auth/callback",
+		socket_server: 'wss://socket.edvinasmomkus.workers.dev'
+	}
+}
+
+const urls = fetch_urls[developement? "dev" : "prod"];
 
 const google_link = generateGoogleOAuthURL({
 	clientId: "921552139948-6kg6f73mdn1dlmp4pn278e19j28cfkb4.apps.googleusercontent.com",
-	redirectUri: "https://dev.edvinas.online/auth/callback"
+	redirectUri: urls.auth_redirect
 });
 
 const list = await (Astro.locals.runtime.env.User as unknown as UserService).list()
 
 ---
+<script is:inline define:vars={{url: urls.socket_server}}>
+	window.socket_server_url = url;
+</script>
+
 <style>
 	.user {
 		display: flex;
@@ -22,6 +42,9 @@ const list = await (Astro.locals.runtime.env.User as unknown as UserService).lis
 	Hello!
 </h1>
 <p>this Astro app is to test an api features:</p>
+<div>
+	We are in {developement ? "developement" : "production"} version
+</div>
 <div>
 	<h2>
 OAuth2 login - 
@@ -104,9 +127,14 @@ OAuth2 login -
 
 <script>
 
+	//@ts-ignore
+	const s_url = window.socket_server_url
+	console.log(s_url)
+	if (!s_url) throw new Error('missing socket url')
+
 	const token = await fetch("/socket/keys").then((response) => response.json() as Promise<{key: string}>);
-	
-	const address = new URL("wss://socket.edvinas.online");
+
+	const address = new URL(s_url);
 	
 	address.pathname = 'websocket';
 	address.searchParams.set('token', token.key);

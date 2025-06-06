@@ -24,7 +24,10 @@
 		{ "binding": "Auth", "service": "api", "entrypoint": "Auth" },
 		{ "binding": "Chat", "service": "api", "entrypoint": "Chat" },
 		{ "binding": "WebSocket", "service": "api", "entrypoint": "SocketUtils" },
-	]
+	],
+	"vars": {
+		"DEV": false
+	},
 	/**
 	 * Smart Placement
 	 * Docs: https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement

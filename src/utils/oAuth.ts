@@ -1,3 +1,7 @@
+/*
+	not used
+*/
+
 type LinkParams = {
 	clientId: string,
 	redirectUri: string,

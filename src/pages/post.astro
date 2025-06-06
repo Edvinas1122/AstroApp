@@ -1,0 +1,57 @@
+---
+import {type WordsService} from "../../../api/src/index";
+
+export const prerender = false;
+
+const app_api = Astro.locals.runtime.env.Words as unknown as WordsService;
+
+
+
+if (Astro.request.method === "POST") {
+  try {
+    console.log(Astro.request.headers.get("content-type"))
+    const data = await Astro.request.formData();
+    const word = data.get("word")?.toString() || '';
+    const language = data.get("language")?.toString() || 'english';
+
+
+	  const info = await app_api.post({
+      language, word
+    });
+    
+    console.log("Logging info:",info)
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error(error.message);
+    }
+  }
+}
+
+const words = await app_api.get();
+
+if ("message" in words) throw new Error(words?.message)
+
+---
+<h1>Words</h1>
+
+<form method="POST" enctype="multipart/form-data">
+  <label>
+    Word:
+    <input type="text" name="word" required />
+  </label>
+  <label>
+    Language:
+    <select name="language">
+      <option value="English">English</option>
+      <option value="Russian">Russian</option>
+    </select>
+  </label>
+  <button type="submit">Submit</button>
+  <ul>
+    {words.map((word) => (
+       <li>
+         <div><h2>{word.word}</h2><p>{word.language}</p></div>
+       </li>)
+   )}
+ </ul>
+</form>

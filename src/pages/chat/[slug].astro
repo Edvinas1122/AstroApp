@@ -1,0 +1,79 @@
+---
+import type { ChatService } from "../../../../api/src";
+export const prerender = false;
+
+const {slug} = Astro.params;
+if (!slug) throw new Error('no path');
+
+const chat = Astro.locals.runtime.env.Chat as unknown as ChatService;
+
+const cookie = Astro.cookies.get('token')?.value;
+if (!cookie) throw new Error('not authentificated');
+
+if (Astro.request.method === "POST") {
+	const data = await Astro.request.formData();
+	const content = data.get('content')?.toString() || '-';
+	console.log("sending message - ", content)
+	const result = await chat.send(cookie, slug, content);
+	console.log(result);
+}
+
+const chat_data = await chat.messages(cookie, slug);
+const members = await chat.members(cookie, slug);
+
+function selectMember(id: string) {
+	return members.find((item) => item.ch_member.id === id)?.user;
+}
+console.log(chat_data);
+---
+
+<style>
+	.row {
+		display: flex;
+		flex-direction: row;
+	}
+</style>
+
+<h1>Chat</h1>
+{
+	chat_data.map((item) => (
+		<div class="row">
+			<div>
+				<img style={{
+					height: "30px",
+					borderRadius: "100%"
+				}} src={selectMember(item.member)?.picture}/>
+				{`${selectMember(item.member)?.name} date: ${item.sent}`}
+				<p>{`message: ${item.content}`}</p>
+			</div>
+		</div>
+	))
+}
+
+<form method="POST" enctype="multipart/form-data">
+	<h2>Message</h2>
+	<input
+		type="text"
+		name="content"
+	/>
+	<button type="submit">Send</button>
+</form>
+
+<a href={`/invite/${slug}`}>Invite</a>
+
+<h2>Members</h2>
+<div>
+	{
+		members.map((item) => (
+			<div>
+				<img style={{
+					height: "30px",
+					borderRadius: "100%"
+				}} src={item.user.picture}/>
+				{`${item.user.given_name} - ${item.ch_member.role}`}
+			</div>
+		))
+	}
+</div>
+
+

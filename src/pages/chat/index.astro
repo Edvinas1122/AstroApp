@@ -1,0 +1,55 @@
+---
+import type { ChatService } from "../../../../api/src";
+export const prerender = false
+
+const chat = Astro.locals.runtime.env.Chat as unknown as ChatService;
+
+const cookie = Astro.cookies.get('token')?.value;
+if (!cookie) throw new Error('not authentificated');
+
+if (Astro.request.method === "POST") {
+	const data = await Astro.request.formData();
+
+	const intention = data.get('_method')?.toString(); 
+	if (intention === 'POST') {
+		const ch_name = data.get('name')?.toString() || '-';
+		console.log("creating - ", ch_name)
+		const result = await chat.create(cookie, ch_name, "");
+		console.log(result);
+		return Astro.redirect(Astro.url.pathname);
+	} else if (intention === 'DELETE') {
+		const ch_name = data.get('id')?.toString() || '-';
+		console.log("deleting - ", ch_name)
+		const result = await chat.remove(cookie, ch_name);
+		console.log(result);
+		return Astro.redirect(Astro.url.pathname);
+
+	}
+}
+
+
+const chats = await chat.list(cookie);
+---
+
+<h1>Chat</h1>
+{
+	chats.map((item) => (
+		<a href={"/chat/" + item.chat.id}>
+			<div>
+				{item.chat.name}
+			</div>
+		</a>
+		<form method="POST" enctype="multipart/form-data">
+			<button name="_method" value="DELETE">X</button>
+			<input name="id" value={item.chat.id} hidden/>
+		</form>
+	))
+}
+<form method="POST" enctype="multipart/form-data">
+	<h2>Create chat</h2>
+	<input
+		type="text"
+		name="name"
+	/>
+	<button name="_method" value="POST" type="submit">Create</button>
+</form>

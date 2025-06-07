@@ -1,7 +1,7 @@
 ---
 import {generateGoogleOAuthURL} from "../utils/oAuth";
-import type { UserService } from "../../../api/src";
-
+import ErrorBaundry from "./components/ErrorBaundry.astro"
+import Users from "./components/Users.astro"
 export const prerender = false;
 
 const developement = Astro.locals.runtime.env.DEV === 'true'
@@ -24,8 +24,6 @@ const google_link = generateGoogleOAuthURL({
 	clientId: "921552139948-6kg6f73mdn1dlmp4pn278e19j28cfkb4.apps.googleusercontent.com",
 	redirectUri: urls.auth_redirect
 });
-
-// const list = await (Astro.locals.runtime.env.User as unknown as UserService).list();
 
 ---
 <script is:inline define:vars={{url: urls.socket_server}}>
@@ -53,20 +51,14 @@ OAuth2 login -
 <a
 	href={google_link}
 >Google Login</a>
-<!-- <p>Registered users list:</p>
-<p>
-	{
-		list.map((item) => (
-			<div class="user">
-				<p>{item.name}</p>
-				<img style={{
-					height: "30px",
-					borderRadius: "100%"
-				}} src={item.picture}/>
-			</div>
-		))
-	}
-</p> -->
+<p>Registered users list:</p>
+<ErrorBaundry>
+	<Users/>
+    <div slot="error">
+       {(error: Error) => <p>Something went wrong! Error: {error.message}</p>}
+    </div>
+</ErrorBaundry>
+
 </div>
 <div>
 	<h2>Chat</h2>
@@ -131,6 +123,7 @@ OAuth2 login -
 	//@ts-ignore
 	const s_url = window.socket_server_url
 	console.log(s_url)
+	// throw new Error("skip")
 	if (!s_url) throw new Error('missing socket url')
 
 	const token = await fetch("/socket/keys").then((response) => response.json() as Promise<{key: string}>);

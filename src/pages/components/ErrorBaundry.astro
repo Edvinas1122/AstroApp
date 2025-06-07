@@ -1,0 +1,11 @@
+---
+// ErrorBoundary.astro
+let html
+
+try {
+    html = await Astro.slots.render('default')
+} catch (e) {
+    html = await Astro.slots.render('error', [e])
+}
+---
+<Fragment set:html={html}/>

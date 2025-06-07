@@ -1,0 +1,22 @@
+---
+import type { UserService } from "../../../../api/src";
+
+export const prerender = false;
+
+const list = await (Astro.locals.runtime.env.User as unknown as UserService).list();
+
+---
+<p>
+	{
+		list.map((item) => (
+			<div class="user">
+				<p>{item.name}</p>
+				<img style={{
+					height: "30px",
+					borderRadius: "100%"
+				}} src={item.picture}/>
+			</div>
+		))
+	}
+</p>
+

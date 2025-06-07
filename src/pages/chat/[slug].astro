@@ -15,7 +15,7 @@ if (Astro.request.method === "POST") {
 	const content = data.get('content')?.toString() || '-';
 	console.log("sending message - ", content)
 	const result = await chat.send(cookie, slug, content);
-	console.log(result);
+	Astro.redirect(Astro.url.pathname);
 }
 
 const chat_data = await chat.messages(cookie, slug);

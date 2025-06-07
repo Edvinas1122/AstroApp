@@ -119,11 +119,14 @@ OAuth2 login -
 </script>
 
 <script>
-
-	//@ts-ignore
+	declare global {
+		interface Window {
+			socket_server_url: string | undefined
+		}
+	};
+	
 	const s_url = window.socket_server_url
 	console.log(s_url)
-	// throw new Error("skip")
 	if (!s_url) throw new Error('missing socket url')
 
 	const token = await fetch("/socket/keys").then((response) => response.json() as Promise<{key: string}>);

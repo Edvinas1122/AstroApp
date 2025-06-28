@@ -5,25 +5,25 @@ import type { ChatService } from '../../../api/src';
 export const chat = {
 	messages: defineAction({
 		input: z.object({
-			chat_id: z.string(),
+			id: z.string(),
 			page: z.number()
 		}),
 		handler: async (input, context) => {
 			const chat = context.locals.runtime.env.Chat as unknown as ChatService
 			const email = context.locals.user.email;
-			return await chat.messages(email, input.chat_id);
+			return await chat.messages(email, input.id);
 		}
 	}),
 	send: defineAction({
 		input: z.object({
-			chat_id: z.string(),
+			id: z.string(),
 			content: z.string(),
 		}),
 		handler: async (input, context) => {
 			const chat = context.locals.runtime.env.Chat as unknown as ChatService
 			const email = context.locals.user.email;
-			console.log('sending message', email, input.chat_id, input.content);
-			const response = await chat.send(email, input.chat_id, input.content);
+			console.log('sending message', email, input.id, input.content);
+			const response = await chat.send(email, input.id, input.content);
 			console.log("response:", response);
 			// console.log(await callRPC(chat, 'send', email, input.chat_id, input.content));
 			return response;
@@ -32,14 +32,14 @@ export const chat = {
 	}),
 	members: defineAction({
 		input: z.object({
-			chat_id: z.string(),
+			id: z.string(),
 			page: z.number()
 		}),
 		handler: async (input, context) => {
 			const chat = context.locals.runtime.env.Chat as unknown as ChatService
 			const email = context.locals.user.email;
 
-			return await chat.members(email, input.chat_id);
+			return await chat.members(email, input.id);
 		}
 	})
 }

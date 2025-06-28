@@ -6,6 +6,16 @@
   --right-msg-bg: #579ffb;
 }
 
+.chatPage {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	height: 100vh;
+	background-image: var(--body-bg);
+	font-family: Helvetica, sans-serif;
+}
+
 .msger {
 	display: flex;
 	flex-flow: column wrap;

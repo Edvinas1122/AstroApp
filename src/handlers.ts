@@ -1,43 +1,6 @@
-import {z} from "zod";
-
-// Define each message type's structure
-const SystemMessage = z.object({
-  type: z.literal('system'),
-  content: z.object({
-    info: z.string(),
-	user: z.string().optional()
-  }),
-});
-
-const ChatMessage = z.object({
-  type: z.literal('chat'),
-  content: z.object({
-    // chat_id: z.string(),
-
-		content: z.string(),
-		member: z.string(),
-		sent: z.string(),
-		id: z.string(),
-		chat: z.string()
-  }),
-});
-
-const EventMessage = z.object({
-  type: z.literal('event'),
-  content: z.object({
-    eventName: z.string(),
-    payload: z.record(z.any()),
-  }),
-});
-
-const MessageSchema = z.discriminatedUnion('type', [
-  SystemMessage,
-  ChatMessage,
-  EventMessage,
-]);
+import { MessageSchema, type Message } from "./ws.schema";
 
 type Handler = (ws: WebSocket, message: any) => any
-
 
 const handlers = new Map<string, Handler>();
 
@@ -46,12 +9,14 @@ handlers.set('system', (ws, m) => {
 });
 
 
-import { chat } from "./chatStore";
+import { messages, members } from "./chatStore";
 
-handlers.set('chat', (ws, m: z.infer<typeof ChatMessage>['content']) => {
-	chat.receive(m);
+handlers.set('chat', (ws, m: Message['content']) => {
+	messages.receive(m);
 	// chat.set(m.message.chat, m.message)
 })
+
+// import { AtomWebSocket } from "./utils/socket";
 
 export const onMessage = (ws: WebSocket) => (message: MessageEvent) => {
 

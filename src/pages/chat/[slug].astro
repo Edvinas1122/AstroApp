@@ -11,43 +11,13 @@ if (!slug) throw new Error('no path');
 const chat = Astro.locals.runtime.env.Chat as unknown as ChatService;
 const user_email = Astro.locals.user.email;
 
-// if (Astro.request.method === "POST") {
-// 	const data = await Astro.request.formData();
-// 	const content = data.get('content')?.toString() || '-';
-// 	console.log("sending message - ", content)
-// 	const result = await chat.send(cookie, slug, content);
-// 	Astro.redirect(Astro.url.pathname);
-// }
+// const members = await chat.members(user_email, slug);
 
+// if (!members.length) throw new Error('not found');
 
-// const messages = await chat.messages(user_email, slug);
-const members = await chat.members(user_email, slug);
-
-if (!members.length) throw new Error('not found');
-
-// function selectMember(id: string) {
-// 	return members.find((item) => item.ch_member.id === id)?.user;
-// }
-// console.log("chat messages:", messages);
-console.log("chat members:", members);
 console.log("chat:",slug)
 ---
 <AppLayout>
-	<style>
-		.page {
-			display: flex;
-			justify-content: center;
-			align-items: center;
-			height: 100vh;
-			background-image: var(--body-bg);
-			font-family: Helvetica, sans-serif;
-		}
-		.row {
-			display: flex;
-			flex-direction: row;
-		}
-	</style>
-<div class="page">
 
 	<Chat
 		id={slug}
@@ -55,22 +25,5 @@ console.log("chat:",slug)
 		client:load
 	/>
 
-	<a href={`/invite/${slug}`}>Invite</a>
-	
-	<h2>Members</h2>
-	<div>
-		{
-			members.map((item) => (
-				<div>
-					<img style={{
-						height: "30px",
-						borderRadius: "100%"
-					}} src={item.user.picture}/>
-					{`${item.user.given_name} - ${item.ch_member.role}`}
-				</div>
-			))
-		}
-	</div>
-</div>
 
 </AppLayout>

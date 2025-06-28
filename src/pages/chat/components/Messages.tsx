@@ -9,8 +9,9 @@ type Message = {
 }
 
 import { useEffect, useRef } from "preact/hooks";
-import {chat,  members} from "../../../chatStore";
+import {messages,  members} from "../../../chatStore";
 import { useStore } from "@nanostores/preact";
+
 
 type ChatReq = {
 	id: string,
@@ -18,24 +19,63 @@ type ChatReq = {
 };
 
 function useLiveChat(id: string) {
-	const _members = useStore(members.$members)[id] || []
-	const _messages = useStore(chat.$messages)[id] || [];
+	const _members = useStore(members.$store)[id] || []
+	const _messages = useStore(messages.$store)[id] || [];
 
 	useEffect(() => {
 		members.fetch(id);
-		chat.fetch(id);
+		messages.fetch(id);
 	}, [id]);
 
-	return {members: _members, messages: _messages}
+	return {members: _members, _messages}
+}
+import type { VNode } from 'preact';
+
+interface ListBoxProps {
+    header?: VNode | string;
+    children?: VNode | VNode[];
+    footer?: VNode;
+    class?: string;
+	width?: string
 }
 
+const ListBox = ({ header, children, footer, class: className = '', width }: ListBoxProps) => (
+    <div class={`${styles.msger} ${className}`} 
+		style={{
+			maxWidth: width
+		}}
+	>
+        {header && (
+            <header class={styles.msgerHeader}>
+                {typeof header === 'string' ? (
+                    <div class={styles.msgerHeaderTitle}>
+                        {header}
+                    </div>
+                ) : (
+                    header
+                )}
+            </header>
+        )}
+        
+        <main class={styles.msgerChat}>
+            {children}
+        </main>
+        
+        {footer && (
+            <footer class={styles.msgerInputArea}>
+                {footer}
+            </footer>
+        )}
+    </div>
+);
+
 export function Chat({id, email}: ChatReq) {
-	const {members, messages} = useLiveChat(id);
+	const {members, _messages} = useLiveChat(id);
 	const chatEndRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
 		scrollToBottom();
-	}, [messages]);
+	}, [_messages]);
 
 	const scrollToBottom = () => {
         chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -63,27 +103,40 @@ export function Chat({id, email}: ChatReq) {
 	function handleSubmit(data: FormData) {
 		const content = data.get('content')?.toString();
 		if (!content) return ;
-		chat.send({chat_id: id, content});
+		messages.send({id, content});
 	}
 
 	return (
-		<div className={styles.msger}>
-			  <header className={styles.msgerHeader}>
-				<div className={styles.msgerHeaderTitle}>
-				<i class="fas fa-comment-alt"></i> Chat
-				</div>
-				{/* <div className={styles.msgerStylesOptions}>
-				<span><i class="fas fa-cog"></i></span>
-				</div> */}
-			</header>
-			<main className={styles.msgerChat}>
-				{messages.map(renderMessage)}
-				<div ref={chatEndRef}/>
-			</main>
-			<Send onSubmit={handleSubmit}/>
+		<div className={styles.chatPage}>
+			<ListBox
+				width='1000px'
+				header={<><i class="fas fa-comment-alt"></i> Chat</>}
+				footer={<Send onSubmit={handleSubmit}/>}
+			>
+				<main className={styles.msgerChat}>
+					{_messages.map(renderMessage)}
+					<div ref={chatEndRef}/>
+				</main>
+			</ListBox>
+			<ListBox
+				width='200px'
+				header={<>Members</>}
+				footer={<a href={`/invite/${id}`}>Invite</a>}
+			>
+				{members.map((item) => (
+					<div>
+						<img style={{
+							height: "30px",
+							borderRadius: "100%"
+						}} src={item.user.picture}/>
+						{`${item.user.given_name} - ${item.ch_member.role}`}
+					</div>
+				))}
+			</ListBox>
 		</div>
 	);
 }
+
 
 type MessageProps = {
 	name: string,
@@ -112,7 +165,7 @@ const Message = ({ name, picture, sent, content, my }: MessageProps) => (
 
 
 const Send = ({ onSubmit }: { onSubmit: (formData: FormData) => void }) => {
-	const inputRef = useRef<HTMLInputElement>(null);
+	const inputRef = useRef<HTMLTextAreaElement>(null);
 
 	const handleSubmit = (e: Event) => {
 		e.preventDefault();
@@ -138,7 +191,7 @@ const Send = ({ onSubmit }: { onSubmit: (formData: FormData) => void }) => {
 
 	return (
 		<form className={styles.msgerInputarea}>
-			<textarea type="text" name="content" placeholder="Enter your message..." 
+			<textarea name="content" placeholder="Enter your message..." 
 				className={styles.msgerInput}
 				ref={inputRef}
 				onKeyDown={handleKeyDown}

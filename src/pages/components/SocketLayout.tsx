@@ -3,6 +3,8 @@ import {
 	onConnect,
 	onMessage
 } from '../../handlers'
+import { useStore } from "@nanostores/preact";
+import { $socket } from "../../chatStore"
 
 export function Socket({
 	children,
@@ -80,7 +82,7 @@ function useReconnect(
 
 function useAuthWebSocket(url: string, auth_url: string) {
 
-	const [socket, setSocket] = useState<WebSocket|null>(null);
+	const socket = useStore($socket)
 
 	const connect = () => fetch(auth_url)
 			.then((response) => response.json() as Promise<{ key: string }>)
@@ -91,11 +93,13 @@ function useAuthWebSocket(url: string, auth_url: string) {
 				console.log('connecting to socket');
 				return new WebSocket(address.href)
 			})
-			.then(setSocket)
+			.then($socket.set)
 			.then(() => true)
 
 	useEffect(() => {
-		connect()
+		if (!$socket.get()) {
+			connect()
+		}
 	}, [])
 
 	return {socket, connect};

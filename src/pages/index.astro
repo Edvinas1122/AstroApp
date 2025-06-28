@@ -25,162 +25,45 @@ const google_link = generateGoogleOAuthURL({
 	redirectUri: urls.auth_redirect
 });
 
+import AppLayout from './AppLayout.astro';
 ---
-<script is:inline define:vars={{url: urls.socket_server}}>
-	window.socket_server_url = url;
-</script>
 
-<style>
-	.user {
-		display: flex;
-		flex-direction: row;
-	}
-</style>
-
-<h1>
-	Hello!
-</h1>
-<p>this Astro app is to test an api features:</p>
-<div>
-	We are in {developement ? "developement" : "production"} version
-</div>
-<div>
-	<h2>
-OAuth2 login - 
-	</h2>
-<a
-	href={google_link}
->Google Login</a>
-<p>Registered users list:</p>
-<ErrorBaundry>
-	<Users/>
-    <div slot="error">
-       {(error: Error) => <p>Something went wrong! Error: {error.message}</p>}
-    </div>
-</ErrorBaundry>
-
-</div>
-<div>
-	<h2>Chat</h2>
-	<a href="/chat">chat link</a>
-</div>
-<div>
-	<h2>Socket server</h2>
-	<div id="ws_app"><div>
-</div>
-
-<script>
-	declare global {
-		interface Window {
-			messages: {
-				display: (text: string) => void;
-				set: (action: (data: any) => void) => void
-			}
+<AppLayout>
+	<style>
+		.user {
+			display: flex;
+			flex-direction: row;
 		}
-	};
+	</style>
 
-	let form_action = (data: any) => console.log("handler not set", data);
-
-	window.messages = {
-		display: (text: string) => {
-			console.log("Received message:", text);
-			const app = document.getElementById('ws_app');
-			if (!app) throw new Error('no div found');
-	
-			app.innerHTML = '';
-			const message = document.createElement('p');
-			message.textContent = `Message: ${text}`;
-			app.appendChild(message);
-	
-			const form = document.createElement('form');
-	
-			const input = document.createElement('input');
-				input.type = 'text';
-				input.placeholder = 'Enter message';
-				input.required = true;
-				
-			const button = document.createElement('button');
-				button.type = 'submit';
-				button.innerText = 'Send';
-	
-			form.appendChild(input);
-			form.appendChild(button);
-	
-			form.addEventListener('submit', (event) => {
-				event.preventDefault(); // prevent page reload
-				form_action(input.value);
-				input.value = ''; // optionally clear input
-			});
-			app.appendChild(form);
-		},
-		set: (action) => {form_action = action},
-	}
-
-</script>
-
-<script>
-	declare global {
-		interface Window {
-			socket_server_url: string | undefined
-		}
-	};
-	
-	const s_url = window.socket_server_url
-	console.log(s_url)
-	if (!s_url) throw new Error('missing socket url')
-
-	const token = await fetch("/socket/keys").then((response) => response.json() as Promise<{key: string}>);
-
-	const address = new URL(s_url);
-	
-	address.pathname = 'websocket';
-	address.searchParams.set('token', token.key);
-
-	const socket = new WebSocket(address.href);
-
-
-	socket.onerror = (event) => {
-		console.error(event)
-	}
-	
-
-	socket.onmessage = (event) => {
-		console.log(event.data)
-		window.messages.display(event.data);
-	}
-
-	socket.onopen = (event) => {
-		
-		socket.send(
-			format('system', "testing")
-		);
-	}
-
-	socket.onclose = (event) => {
-		console.log(event);
-	}
-
-	function whenLoaded() {
-		console.log('dom loaded trigger')
-		window.messages.set((message: string) => {
-			console.log("calling send",message);
-			socket.send(
-				format('system', message)
-			)
-		})
-	}
-	function format(type: 'system', info: string) {
-		return JSON.stringify({type, content: {info}})
-	}
-
-	if (document.readyState !== 'loading') {
-		whenLoaded();
-	} else {
-		document.addEventListener('DOMContentLoaded', () => {
-			whenLoaded();
-		})
-	}
-
-
-
-</script>
+	<h1>
+		Hello!
+	</h1>
+	<p>this Astro app is to test an api features:</p>
+	<div>
+		We are in {developement ? "developement" : "production"} version
+	</div>
+	<div>
+		<h2>
+	OAuth2 login - 
+		</h2>
+	<a
+		href={google_link}
+	>Google Login</a>
+	<p>Registered users list:</p>
+	<ErrorBaundry>
+		<Users/>
+		<div slot="error">
+		{(error: Error) => <p>Something went wrong! Error: {error.message}</p>}
+		</div>
+	</ErrorBaundry>
+	</div>
+	<div>
+		<h2>Chat</h2>
+		<a href="/chat">chat link</a>
+	</div>
+	<div>
+		<h2>Socket server</h2>
+		<div id="ws_app"><div>
+	</div>
+</AppLayout>

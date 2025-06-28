@@ -1,0 +1,38 @@
+---
+import { ClientRouter } from "astro:transitions";
+import { Socket } from "./components/SocketLayout";
+
+const fetch_urls = {
+	dev: {
+		auth_redirect: "https://dev.edvinas.online/auth/callback",
+		socket_server: "wss://socket.edvinas.online",
+	},
+	prod: {
+		auth_redirect: "https://journal.edvinas.online/auth/callback",
+		socket_server: 'wss://socket.edvinasmomkus.workers.dev'
+	}
+}
+
+const developement = Astro.locals.runtime.env.DEV === 'true'
+const urls = fetch_urls[developement? "dev" : "prod"];
+
+---
+
+<html transition:animate="none">
+  <head>
+    <title>Astro SPA</title>
+    <ClientRouter/>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css"/>
+
+  </head>
+  <body>
+	<main>
+		<Socket
+			client:load
+			url={urls.socket_server}
+		>
+			<slot/>
+		</Socket>
+    </main>
+  </body>
+</html>

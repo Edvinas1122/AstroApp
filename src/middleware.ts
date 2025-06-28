@@ -2,18 +2,22 @@ import { defineMiddleware } from "astro:middleware";
 import type { MiddlewareHandler, MiddlewareNext, APIContext } from "astro";
 import type { UserService } from "../../api/src";
 
+export const prerender = false;
+
+
 const auth_routes = [
 	"/chat",
-	"/socket"
+	"/socket",
+	'/_actions'
 ]
 
 export const onRequest = defineMiddleware(
-	withLog(
+	// withLog(
 		withToken(
 			auth_routes,
 			'token',
 			async (token, context, next) => {
-				console.log('middleware call', context.url);
+				// console.log('middleware call', context.url);
 				const user = context.locals.runtime.env.User as unknown as UserService;
 				const user_data = await user.verify(token);
 				if ('message' in user_data) return RedirectAuth();
@@ -22,7 +26,8 @@ export const onRequest = defineMiddleware(
 				}
 				return next();
 		})
-));
+// )
+);
 
 function withToken(
 	guardRoutes: string[],

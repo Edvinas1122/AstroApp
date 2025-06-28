@@ -1,11 +1,9 @@
 ---
-import type { ChatService } from "../../../../api/src";
+import type { ChatService } from "@api/chat.service";
 export const prerender = false
 
-const chat = Astro.locals.runtime.env.Chat as unknown as ChatService;
-
-const cookie = Astro.cookies.get('token')?.value;
-if (!cookie) throw new Error('not authentificated');
+const chat = Astro.locals.runtime.env.Chat as ChatService;
+const email = Astro.locals.user.email;
 
 if (Astro.request.method === "POST") {
 	const data = await Astro.request.formData();
@@ -14,13 +12,13 @@ if (Astro.request.method === "POST") {
 	if (intention === 'POST') {
 		const ch_name = data.get('name')?.toString() || '-';
 		console.log("creating - ", ch_name)
-		const result = await chat.create(cookie, ch_name, "");
+		const result = await chat.create(email, ch_name);
 		console.log(result);
 		return Astro.redirect(Astro.url.pathname);
 	} else if (intention === 'DELETE') {
 		const ch_name = data.get('id')?.toString() || '-';
 		console.log("deleting - ", ch_name)
-		const result = await chat.remove(cookie, ch_name);
+		const result = await chat.delete(email, ch_name);
 		console.log(result);
 		return Astro.redirect(Astro.url.pathname);
 
@@ -28,9 +26,13 @@ if (Astro.request.method === "POST") {
 }
 
 
-const chats = await chat.list(cookie);
----
+const chats = await chat.list(email);
+console.log(chats);
 
+import AppLayout from "../AppLayout.astro";
+---
+<AppLayout>
+	<>
 <h1>Chat</h1>
 {
 	chats.map((item) => (
@@ -53,3 +55,5 @@ const chats = await chat.list(cookie);
 	/>
 	<button name="_method" value="POST" type="submit">Create</button>
 </form>
+</>
+</AppLayout>

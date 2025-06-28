@@ -18,7 +18,7 @@ const cookie = (token: string) => [
   'Path=/',
   `Max-Age=${params.token_age}`,
   `Domain=${params.domain}`
-];
+]
 
 export const GET: APIRoute = withError(
 	async (context, {validate}) => {

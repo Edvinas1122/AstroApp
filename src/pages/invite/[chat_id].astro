@@ -14,9 +14,8 @@ if (!cookie) throw new Error('not authentificated');
 if (Astro.request.method === "POST") {
 	const data = await Astro.request.formData();
 	const content = data.get('email')?.toString() || '-';
-	console.log("sending message - ", content)
 	const result = await chat.sign(cookie, chat_id, content, 'participant');
-	console.log(result);
+	Astro.redirect(`/chat/${chat_id}`);
 }
 
 const members = await chat.members(cookie, chat_id)

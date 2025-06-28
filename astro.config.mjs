@@ -3,6 +3,8 @@ import { defineConfig } from 'astro/config';
 
 import cloudflare from '@astrojs/cloudflare';
 
+import preact from '@astrojs/preact';
+
 // https://astro.build/config
 export default defineConfig({
   adapter: cloudflare({
@@ -10,11 +12,14 @@ export default defineConfig({
       enabled: true
     },
   }),
+
   vite: {
     server: {
       allowedHosts: [
         'dev.edvinas.online'
       ]
     }
-  }
+  },
+
+  integrations: [preact()]
 });

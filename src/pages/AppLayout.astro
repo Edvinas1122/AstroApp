@@ -1,38 +1,28 @@
 ---
-import { ClientRouter } from "astro:transitions";
-import { Socket } from "./components/SocketLayout";
-
-const fetch_urls = {
-	dev: {
-		auth_redirect: "https://dev.edvinas.online/auth/callback",
-		socket_server: "wss://socket.edvinas.online",
-	},
-	prod: {
-		auth_redirect: "https://journal.edvinas.online/auth/callback",
-		socket_server: 'wss://socket.edvinasmomkus.workers.dev'
-	}
-}
-
-const developement = Astro.locals.runtime.env.DEV === 'true'
-const urls = fetch_urls[developement? "dev" : "prod"];
 
 ---
 
 <html transition:animate="none">
   <head>
     <title>Astro SPA</title>
-    <ClientRouter/>
+    <!-- <ClientRouter/> -->
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css"/>
-
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+	<style>
+		.middle {
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
+			height: 100vh;
+			background-image: var(--body-bg);
+			font-family: Helvetica, sans-serif;
+		}
+	</style>
   </head>
   <body>
-	<main>
-		<Socket
-			client:load
-			url={urls.socket_server}
-		>
-			<slot/>
-		</Socket>
+	<main class="middle">
+		<slot/>
     </main>
   </body>
 </html>

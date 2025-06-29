@@ -20,7 +20,7 @@ export const onRequest = defineMiddleware(
 				// console.log('middleware call', context.url);
 				const user = context.locals.runtime.env.User as unknown as UserService;
 				const user_data = await user.verify(token);
-				if ('message' in user_data) return RedirectAuth();
+				if ('message' in user_data) return Redirect('/?auth=require_login');
 				context.locals.user = {
 					email: user_data.payload.email
 				}
@@ -37,21 +37,22 @@ function withToken(
 	return async function (context, next) {
 
 		const route = new URL(context.url).pathname;
-
+		const cookie = context.cookies.get(tokenName)?.value;
 		if (guardRoutes.some((_route) => route.startsWith(_route))) {
-			const cookie = context.cookies.get(tokenName)?.value;
-			if (!cookie) return RedirectAuth();
+			if (!cookie) return Redirect('/?auth=require_login');
 			return await handleValidation(cookie, context, next);
+		} else if (cookie && route === '/' && new URL(context.url).searchParams.get('auth') !== "require_login") {
+			return Redirect('/chat');
 		}
-		return next()
+		return next();
 	}
 }
 
-function RedirectAuth() {
+function Redirect(location: string) {
 	return new Response('', {
 		status: 302,
 		headers: {
-			location: '/?auth=require_login'
+			location
 		}
 	})
 }

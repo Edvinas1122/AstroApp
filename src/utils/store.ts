@@ -47,6 +47,11 @@ class PageStoreMap<T> {
 			...items
 		]);
 	}
+
+	protected erase(id: string, predicate: (item: T) => boolean) {
+		const filtered = this.get(id).filter(predicate);
+		this.store.setKey(id, filtered);
+	}
 }
 
 class PageStore<T> extends PageStoreMap<T> {
@@ -66,14 +71,6 @@ class PageStore<T> extends PageStoreMap<T> {
 			this.setMany(id, data);
 		});
 	}
-
-	// send(input: ARGS) {
-	// 	this.updateMethod(input).then(this.setResult);
-	// }
-
-	// receive = (data: T) => this.setResult(data); 
-
-	// private setResult = (data: T) => this.set(this.key(data), data);
 }
 
 export {PageStore};

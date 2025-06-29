@@ -12,8 +12,6 @@ const SystemMessage = z.object({
 const ChatMessage = z.object({
   type: z.literal('chat'),
   content: z.object({
-	// chat_id: z.string(),
-
 		content: z.string(),
 		member: z.string(),
 		sent: z.string(),

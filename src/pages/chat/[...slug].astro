@@ -1,0 +1,68 @@
+---
+import type { ChatService } from "../../../../api/src";
+import AppLayout from "../AppLayout.astro";
+import {ChatDisplay} from "./components/Messages"
+import { CreateChatModal, InviteModal } from "./components/Modal";
+import { Socket } from "../components/SocketLayout";
+import { VirtualRouter } from "./components/Router";
+
+const fetch_urls = {
+	dev: {
+		auth_redirect: "https://dev.edvinas.online/auth/callback",
+		socket_server: "wss://socket.edvinas.online",
+	},
+	prod: {
+		auth_redirect: "https://journal.edvinas.online/auth/callback",
+		socket_server: 'wss://socket.edvinasmomkus.workers.dev'
+	}
+}
+
+const developement = Astro.locals.runtime.env.DEV === 'true'
+
+
+export const prerender = false;
+
+const {slug} = Astro.params;
+
+const user_email = Astro.locals.user.email;
+
+const urls = fetch_urls[developement? "dev" : "prod"];
+
+console.log("chat:",slug)
+
+---
+<AppLayout>
+	<VirtualRouter
+		client:load
+	>
+		<Socket
+			client:load
+			url={urls.socket_server}
+		>
+			<div style={{
+				display: 'flex',
+				flexDirection: "row",
+				height: '100vh',
+				width: '100%',
+				justifyContent: 'space-evenly'
+			}}>
+				<!-- <ChatList
+				email={user_email}
+				client:load
+				> -->
+				<InviteModal
+					id={slug}
+					client:load
+				/>
+				<CreateChatModal
+					client:load
+				/>
+				<ChatDisplay
+				id={slug}
+				email={user_email}
+				client:load
+				/>
+			<div>
+		</Socket>
+	</VirtualRouter>
+</AppLayout>

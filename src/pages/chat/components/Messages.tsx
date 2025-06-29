@@ -1,24 +1,18 @@
 import styles from './Chat.module.css'
-
-type Message = {
-	id: string;
-	chat: string;
-	member: string;
-	content: string;
-	sent: string | null;
-}
-
 import { useEffect, useRef } from "preact/hooks";
-import {messages,  members} from "../../../chatStore";
+import {messages,  members, chats, $invite_modal, $createChat_modal, route} from "../../../chatStore";
+import type { Message, Chat } from '../../../chatStore';
 import { useStore } from "@nanostores/preact";
-
+// import { Suspense, lazy } from 'preact/compat';
 
 type ChatReq = {
 	id: string,
 	email: string, // current user email
 };
 
-function useLiveChat(id: string) {
+function useLiveChat() {
+	const id = useStore(route)[1];
+	console.log("live chat:", id);
 	const _members = useStore(members.$store)[id] || []
 	const _messages = useStore(messages.$store)[id] || [];
 
@@ -69,7 +63,8 @@ const ListBox = ({ header, children, footer, class: className = '', width }: Lis
     </div>
 );
 
-export function Chat({id, email}: ChatReq) {
+
+export function ChatDisplay({id, email}: ChatReq) {
 	const {members, _messages} = useLiveChat(id);
 	const chatEndRef = useRef<HTMLDivElement>(null);
 
@@ -107,7 +102,10 @@ export function Chat({id, email}: ChatReq) {
 	}
 
 	return (
-		<div className={styles.chatPage}>
+		<>
+			<ChatList
+				email={email}
+			/>
 			<ListBox
 				width='1000px'
 				header={<><i class="fas fa-comment-alt"></i> Chat</>}
@@ -121,7 +119,11 @@ export function Chat({id, email}: ChatReq) {
 			<ListBox
 				width='200px'
 				header={<>Members</>}
-				footer={<a href={`/invite/${id}`}>Invite</a>}
+				footer={
+				<>
+				<a onClick={() => $invite_modal.set(true)}>Invite users</a>
+				</>
+				}
 			>
 				{members.map((item) => (
 					<div>
@@ -133,7 +135,7 @@ export function Chat({id, email}: ChatReq) {
 					</div>
 				))}
 			</ListBox>
-		</div>
+		</>
 	);
 }
 
@@ -202,3 +204,49 @@ const Send = ({ onSubmit }: { onSubmit: (formData: FormData) => void }) => {
 		</form>
 	);
 };
+
+interface ChatListProps {
+	email: string
+}
+
+function ChatList({email}: ChatListProps) {
+	const _chats = useStore(chats.$store)['default'] || [];
+	const chatEndRef = useRef<HTMLDivElement>(null);
+
+	useEffect(() => {
+		chats.fetch('default');
+	}, [email])
+
+	function renderChat(item: Chat) {
+		const id = item.chat.id;
+		return (
+			<div>
+				<a 
+				onClick={() => window.history.pushState({}, '', `/chat/${id}`)}
+				// href={`/chat/${id}`}
+				>
+					<div>{item.chat.name}</div>
+				</a>
+				<button
+					onClick={() => chats.delete({id})}
+				>X</button>
+			</div>
+		)
+	}
+
+	return (
+		<>
+			<ListBox
+				width='200px'
+				header={<>Chats</>}
+				footer={
+					<button onClick={() => $createChat_modal.set(true)}>Create Chat</button>
+				}>
+				<main className={styles.msgerChat}>
+					{_chats.map(renderChat)}
+					<div ref={chatEndRef}/>
+				</main>
+			</ListBox>
+		</>
+	);
+}

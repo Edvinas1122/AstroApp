@@ -1,63 +1,40 @@
-import { defineAction } from "astro:actions";
 import { z } from 'astro:schema';
 import type { ChatService } from '../../../api/src';
+import { createServiceActionBuilder } from "./utils";
+
+const chatAction = createServiceActionBuilder<ChatService>(
+	(context) => context.locals.runtime.env.Chat
+)
+
+const paginate = z.object({
+	id: z.string(),
+	page: z.number()
+})
 
 export const chat = {
-	messages: defineAction({
-		input: z.object({
-			id: z.string(),
-			page: z.number()
-		}),
-		handler: async (input, context) => {
-			const chat = context.locals.runtime.env.Chat as unknown as ChatService
-			const email = context.locals.user.email;
-			return await chat.messages(email, input.id);
-		}
+	chats: chatAction(paginate, async (input, {service, email}) => {
+		return await service.list(email);
 	}),
-	send: defineAction({
-		input: z.object({
-			id: z.string(),
-			content: z.string(),
-		}),
-		handler: async (input, context) => {
-			const chat = context.locals.runtime.env.Chat as unknown as ChatService
-			const email = context.locals.user.email;
-			console.log('sending message', email, input.id, input.content);
-			const response = await chat.send(email, input.id, input.content);
-			console.log("response:", response);
-			// console.log(await callRPC(chat, 'send', email, input.chat_id, input.content));
-			return response;
-			// return await chat.send(email, input.chat_id, input.content);
-		}
+	create: chatAction(z.object({
+		name: z.string().max(15)
+	}), async (input, {service, email}) => {
+		return await service.create(email, input.name);
 	}),
-	members: defineAction({
-		input: z.object({
-			id: z.string(),
-			page: z.number()
-		}),
-		handler: async (input, context) => {
-			const chat = context.locals.runtime.env.Chat as unknown as ChatService
-			const email = context.locals.user.email;
-
-			return await chat.members(email, input.id);
-		}
+	delete: chatAction(z.object({id: z.string()}), async (input, {service, email}) => {
+		return await service.delete(email, input.id);
+	}),
+	messages: chatAction(paginate, async (input, {service, email}) => {
+		return await service.messages(email, input.id);
+	}),
+	send: chatAction(z.object({id: z.string(), content: z.string()}),
+		async (input, {service, email}) => {
+			return await service.send(email, input.id, input.content);
+	}),
+	members: chatAction(paginate, async (input, {service, email}) => {
+			return await service.members(email, input.id);
+	}),
+	invite: chatAction(z.object({id: z.string(), user: z.string()}),
+		async (input, {service, email}) => {
+			return await service.sign(email, input.id, input.user);
 	})
-}
-
-function callRPC<
-  T extends object,
-  K extends keyof T,
-  F extends T[K] & ((...args: any[]) => any) // <-- explicitly ensure it's a function
->(
-  service: T,
-  method: K,
-  ...args: Parameters<F>
-): ReturnType<F> | void {
-  try {
-    const fn = service[method] as F;
-    return fn.apply(service, args);
-  } catch (error: any) {
-    console.error(error.message);
-	return error.message
-  }
 }

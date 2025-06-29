@@ -1,8 +1,5 @@
 ---
 import {generateGoogleOAuthURL} from "../utils/oAuth";
-import ErrorBaundry from "./components/ErrorBaundry.astro"
-import Users from "./components/Users.astro"
-export const prerender = false;
 
 const developement = Astro.locals.runtime.env.DEV === 'true'
 
@@ -17,7 +14,6 @@ const fetch_urls = {
 	}
 }
 
-
 const urls = fetch_urls[developement? "dev" : "prod"];
 
 const google_link = generateGoogleOAuthURL({
@@ -26,44 +22,24 @@ const google_link = generateGoogleOAuthURL({
 });
 
 import AppLayout from './AppLayout.astro';
+import { Card } from "../ui/Material";
+import GoogleSignInButton from "../ui/GoogleSignIn"
 ---
 
 <AppLayout>
-	<style>
-		.user {
-			display: flex;
-			flex-direction: row;
-		}
-	</style>
-
-	<h1>
-		Hello!
-	</h1>
-	<p>this Astro app is to test an api features:</p>
-	<div>
-		We are in {developement ? "developement" : "production"} version
-	</div>
-	<div>
-		<h2>
-	OAuth2 login - 
-		</h2>
-	<a
-		href={google_link}
-	>Google Login</a>
-	<p>Registered users list:</p>
-	<ErrorBaundry>
-		<Users/>
-		<div slot="error">
-		{(error: Error) => <p>Something went wrong! Error: {error.message}</p>}
-		</div>
-	</ErrorBaundry>
-	</div>
-	<div>
-		<h2>Chat</h2>
-		<a href="/chat">chat link</a>
-	</div>
-	<div>
-		<h2>Socket server</h2>
-		<div id="ws_app"><div>
-	</div>
+	<Card>
+		<slot slot="header">
+			<h1>Splash</h1>
+			<p>live chat application, built on <a href="https://workers.cloudflare.com/">Cloudflare's workers<a> and <a href="https://astro.build/">Astro</a> framework. Sign in to see the splash in action.</p>
+			<p>
+				{developement ? "developement" : "production"} version
+			</p>
+		</slot>
+		<GoogleSignInButton
+			href={google_link}
+		/>
+		<slot slot="footer">
+			<a href="terms">Privacy Terms</a>
+		</slot>
+	</Card>
 </AppLayout>

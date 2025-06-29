@@ -11,7 +11,8 @@
     // "baseUrl": ".",
     "paths": {
       "@api/*": ["../api/src/*"],
-      "@root/*": ["./src/*"]
+      "@root/*": ["./src/*"],
+      "@ui/*": ["./src/ui/*"],
     },
     "types": [
       "./worker-configuration.d.ts",

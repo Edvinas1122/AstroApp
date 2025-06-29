@@ -1,0 +1,112 @@
+.card {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    background-color: #ffffff;
+    overflow: hidden;
+    transition: box-shadow 0.3s ease;
+    margin: 16px;
+    display: flex;
+    flex-direction: column;
+	font-family: Helvetica, sans-serif;
+}
+
+.card:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.cardHeader {
+    padding: 16px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.cardHeader h2 {
+    font-size: 1.25rem;
+    font-weight: 500;
+    margin: 0;
+    color: rgba(0, 0, 0, 0.87);
+}
+
+.cardHeader p {
+    font-size: 0.875rem;
+    color: rgba(0, 0, 0, 0.6);
+    margin: 4px 0 0 0;
+}
+
+.cardContent {
+    padding: 16px;
+    flex-grow: 1;
+}
+
+.cardFooter {
+    padding: 8px;
+    display: flex;
+    justify-content: flex-end;
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.cardContent button, 
+.cardContent a {
+    /* Basic reset */
+    padding: 10px 16px;
+    min-width: 64px;
+    background: white; /* Changed to white */
+    border: none;
+    color: #6200ee;
+    /* font-weight: 500; */
+
+    cursor: pointer;
+    transition: all 0.3s ease; /* Changed to transition all properties */
+    border-radius: 4px;
+    font-size: 1rem;
+    display: flex; /* Better than flex for links */
+    align-items: center;
+    justify-content: center;
+    gap: 8px; /* For icon spacing */
+    text-decoration: none; /* Removes underline */
+    
+    /* Shadow effects */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    
+    /* Better text alignment */
+    line-height: 1;
+    
+    /* Remove default button styles */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+/* Hover state */
+.cardContent button:hover, 
+.cardContent a:hover {
+    background: #f5f5f5; /* Slightly darker on hover */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
+    text-decoration: none; /* Ensures no underline appears on hover */
+}
+
+/* Active/focus states */
+.cardContent button:active, 
+.cardContent button:focus,
+.cardContent a:active,
+.cardContent a:focus {
+    background: #eeeeee;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    outline: none;
+}
+
+/* Specific style for links to ensure no underline */
+.cardContent a {
+    text-decoration: none !important;
+	color: inherit
+}
+
+.modalBackground {
+    position: fixed;
+	background-color: rgba(0, 0, 0, 0.5);
+	width: 100%;
+	height: 100%;
+	display: flex;
+    flex-direction: column;
+	align-items: anchor-center;
+	justify-content: center;
+}

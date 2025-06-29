@@ -36,7 +36,7 @@
 	border-bottom: var(--border);
 	background: #eee;
 	color: #666;
-	}
+}
 .msgerChat {
 	flex: 1;
 	overflow-y: auto;

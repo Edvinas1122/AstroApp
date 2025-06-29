@@ -21,7 +21,7 @@ function useLiveChat() {
 		messages.fetch(id);
 	}, [id]);
 
-	return {members: _members, _messages}
+	return {members: _members, _messages, id}
 }
 import type { VNode } from 'preact';
 
@@ -64,8 +64,8 @@ const ListBox = ({ header, children, footer, class: className = '', width }: Lis
 );
 
 
-export function ChatDisplay({id, email}: ChatReq) {
-	const {members, _messages} = useLiveChat(id);
+export function ChatDisplay({email}: ChatReq) {
+	const {members, _messages, id} = useLiveChat();
 	const chatEndRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {

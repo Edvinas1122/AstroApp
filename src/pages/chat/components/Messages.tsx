@@ -3,7 +3,6 @@ import { useEffect, useRef } from "preact/hooks";
 import {messages,  members, chats, $invite_modal, $createChat_modal, route} from "../../../chatStore";
 import type { Message, Chat } from '../../../chatStore';
 import { useStore } from "@nanostores/preact";
-// import { Suspense, lazy } from 'preact/compat';
 
 type ChatReq = {
 	id: string,
@@ -12,7 +11,6 @@ type ChatReq = {
 
 function useLiveChat() {
 	const id = useStore(route)[1];
-	console.log("live chat:", id);
 	const _members = useStore(members.$store)[id] || []
 	const _messages = useStore(messages.$store)[id] || [];
 
@@ -63,6 +61,7 @@ const ListBox = ({ header, children, footer, class: className = '', width }: Lis
     </div>
 );
 
+import { createFormAction } from '../../../ui/utils';
 
 export function ChatDisplay({email}: ChatReq) {
 	const {members, _messages, id} = useLiveChat();
@@ -95,11 +94,9 @@ export function ChatDisplay({email}: ChatReq) {
 		/>;
 	}
 
-	function handleSubmit(data: FormData) {
-		const content = data.get('content')?.toString();
-		if (!content) return ;
+	const submit = createFormAction(['content'], ({content}) => {
 		messages.send({id, content});
-	}
+	})
 
 	return (
 		<>
@@ -109,7 +106,17 @@ export function ChatDisplay({email}: ChatReq) {
 			<ListBox
 				width='1000px'
 				header={<><i class="fas fa-comment-alt"></i> Chat</>}
-				footer={<Send onSubmit={handleSubmit}/>}
+				footer={
+					<form className={styles.msgerInputarea} onSubmit={submit}>
+						<textarea name="content" placeholder="Enter your message..." 
+							className={styles.msgerInput}
+							onKeyDown={submit.stroke}
+						/>
+						<button
+							className={styles.msgerSendBtn}
+						>Send</button>
+					</form>
+				}
 			>
 				<main className={styles.msgerChat}>
 					{_messages.map(renderMessage)}
@@ -165,46 +172,6 @@ const Message = ({ name, picture, sent, content, my }: MessageProps) => (
     </div>
 );
 
-
-const Send = ({ onSubmit }: { onSubmit: (formData: FormData) => void }) => {
-	const inputRef = useRef<HTMLTextAreaElement>(null);
-
-	const handleSubmit = (e: Event) => {
-		e.preventDefault();
-		const form = e.currentTarget as HTMLFormElement;
-		const formData = new FormData(form);
-		onSubmit(formData);
-        if (inputRef.current) {
-            inputRef.current.value = '';
-        }
-		return false;
-	};
-
-	const handleKeyDown = (e: KeyboardEvent) => {
-		if (e.key === 'Enter' && !e.shiftKey && e.currentTarget) {
-			e.preventDefault();
-			const form = e.currentTarget.form;
-			const formData = new FormData(form);
-			onSubmit(formData);
-			form.reset();
-		}
-		// Shift+Enter will naturally create new lines
-	};
-
-	return (
-		<form className={styles.msgerInputarea}>
-			<textarea name="content" placeholder="Enter your message..." 
-				className={styles.msgerInput}
-				ref={inputRef}
-				onKeyDown={handleKeyDown}
-			/>
-			<button
-				className={styles.msgerSendBtn}
-			>Send</button>
-		</form>
-	);
-};
-
 interface ChatListProps {
 	email: string
 }
@@ -222,8 +189,7 @@ function ChatList({email}: ChatListProps) {
 		return (
 			<div>
 				<a 
-				onClick={() => window.history.pushState({}, '', `/chat/${id}`)}
-				// href={`/chat/${id}`}
+					onClick={() => window.history.pushState({}, '', `/chat/${id}`)}
 				>
 					<div>{item.chat.name}</div>
 				</a>

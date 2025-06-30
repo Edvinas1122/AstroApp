@@ -14,8 +14,10 @@ function useLiveChat() {
 	const _messages = useStore(messages.$store)[id] || [];
 
 	useEffect(() => {
-		members.fetch(id);
-		messages.fetch(id);
+		if (id) {
+			members.fetch(id);
+			messages.fetch(id);
+		}
 	}, [id]);
 
 	return {_members, _messages, id}
@@ -117,63 +119,65 @@ export function ChatDisplay({email}: ChatReq) {
 
 	const my_role = _members.find((memb) => memb.user.email === email)?.ch_member.role
 
-	// if (!my_role) return null;
-
 	const renderAdmin = (item: Member) => (
 		<MemberC item={item}/>
-	)
+	);
 
-	// const renderPar
+	const ChatPort = (
+		<>
+		<ListBox
+			width='1000px'
+			header={<><i class="fas fa-comment-alt"></i> Chat</>}
+			footer={
+				<form className={styles.msgerInputarea} onSubmit={submit}>
+					<textarea name="content" placeholder="Enter your message..." 
+						className={styles.msgerInput}
+						onKeyDown={submit.stroke}
+					/>
+					<button
+						className={styles.msgerSendBtn}
+					>Send</button>
+				</form>
+				}
+			>
+				{!!_messages.length ? <main className={styles.msgerChat}>
+					{_messages.map(renderMessage)}
+					<div ref={chatEndRef}/>
+				</main> : (<div><p>🧙 Epic chat starts with a message ✉️</p></div>)}
+		</ListBox>
+		<ListBox
+			width='200px'
+			header={<>Members</>}
+			footer={
+				<>
+					<a onClick={() => $invite_modal.set(true)}>Invite users</a>
+				</>
+			}
+		>
+			<>
+			<section>
+				<p>Admin</p>
+				{admins.map(renderAdmin)}
+			</section>
+			{!!participants.length && <section>
+				<p>Participants</p>
+				{participants.map(renderAdmin)}
+			</section>}
+			{!!invited.length && <section>
+				<p>Invited</p>
+				{invited.map(renderAdmin)}
+			</section>}
+			</>
+		</ListBox>
+		</>
+	)
 
 	return (
 		<>
 			<ChatList
 				email={email}
 			/>
-			<ListBox
-				width='1000px'
-				header={<><i class="fas fa-comment-alt"></i> Chat</>}
-				footer={
-					<form className={styles.msgerInputarea} onSubmit={submit}>
-						<textarea name="content" placeholder="Enter your message..." 
-							className={styles.msgerInput}
-							onKeyDown={submit.stroke}
-						/>
-						<button
-							className={styles.msgerSendBtn}
-						>Send</button>
-					</form>
-				}
-			>
-				<main className={styles.msgerChat}>
-					{_messages.map(renderMessage)}
-					<div ref={chatEndRef}/>
-				</main>
-			</ListBox>
-			<ListBox
-				width='200px'
-				header={<>Members</>}
-				footer={
-				<>
-					<a onClick={() => $invite_modal.set(true)}>Invite users</a>
-				</>
-				}
-			>
-				<>
-				<section>
-					<p>Admin</p>
-					{admins.map(renderAdmin)}
-				</section>
-				{!!participants.length && <section>
-					<p>Participants</p>
-					{participants.map(renderAdmin)}
-				</section>}
-				{!!invited.length && <section>
-					<p>Invited</p>
-					{invited.map(renderAdmin)}
-				</section>}
-				</>
-			</ListBox>
+			{id ? ChatPort : (<div><p>Start chat by selecting or creating one</p></div>)}
 		</>
 	);
 }

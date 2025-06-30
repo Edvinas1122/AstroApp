@@ -1,9 +1,13 @@
 import { useStore } from "@nanostores/preact";
-import { $invite_modal, route } from "../../../chatStore";
+import { $invite_modal, members, route } from "../../../chatStore";
 import { Modal} from "../../../ui/Material";
 import { useEffect, useState } from "preact/hooks";
 import { actions } from "astro:actions";
 import { createFormAction } from "../../../ui/utils";
+import {
+	$createChat_modal,
+	chats
+} from "../../../chatStore";
 
 type User = {
     email: string;
@@ -33,10 +37,8 @@ export function InviteModal() {
 
 
 	const submit = createFormAction(['email'], ({email}) => {
-		actions.chat.invite({id, user: email}).then(result => {
-			if (result.error) throw new Error('failed fetch invite')
-			console.log(result.data.values)
-		})
+		members.invite({id, user: email});
+		$invite_modal.set(false);
 	})
 
 	return (
@@ -61,10 +63,7 @@ export function InviteModal() {
 	);
 }
 
-import {
-	$createChat_modal,
-	chats
-} from "../../../chatStore";
+
 
 export function CreateChatModal() {
 	const open = useStore($createChat_modal);

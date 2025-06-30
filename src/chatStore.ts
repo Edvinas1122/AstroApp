@@ -6,7 +6,7 @@ export type Message = {
 	sent: string;
 }
 
-type Member = {
+export type Member = {
 	ch_member: {
 		id: string;
 		chat: string;
@@ -51,16 +51,33 @@ import { atom } from "nanostores";
 
 function handleResult<T>(result: SafeResult<any, any>) {
 	if (result.error) throw new Error("failed to fetch:", result.error);
+	console.log('handling store result:', result.data);
 	return result.data as T;
+}
+
+function onSuccess(handler: <T>(data: T) => void) {
+	return (result: SafeResult<any, any>) => {
+		const data = handleResult(result);
+		return handler(data);
+	}
 }
 
 class MemberStore extends PageStore<Member> {
 	invite(input: Parameters<typeof actions.chat.invite>[0]) {
-		actions.chat.invite(input).then(result => {
-			if (result.error) throw new Error('member ivite failure');
-			this.set(input.id, result.data.values as Member)
-		})
+		actions.chat.invite(input).then(onSuccess((data) => {
+			console.log('setting', data);
+			this.set(input.id, data as Member)
+		}))
 	}
+
+	// accept(input: Parameters<typeof actions.chat.accept>[0]) {
+	// 	actions.chat.accept(input).then(onSuccess((data: unknown) => {
+	// 		this.update(input.id,
+	// 			(member) => member.user.email === input.member,
+	// 			(member) => ({...member, ch_member: {...member.ch_member, role: 'participant'}})
+	// 		)
+	// 	}))
+	// }
 }
 
 export const members = new MemberStore(
@@ -116,6 +133,14 @@ class ChatStore extends PageStore<Chat> {
 		actions.chat.delete(input).then((result) => {
 			this.erase(this.key, (item) => item.chat.id !== input.id);
 		})
+	}
+
+	accept(input: Parameters<typeof actions.chat.accept>[0]) {
+		actions.chat.accept(input).then(onSuccess((data: unknown) => {
+			this.update(this.key,
+				(chat) => chat.chat.id === input.id,
+				(chat) => ({...chat, ch_member: {...chat.ch_member, role: 'participant'}}))
+		}))
 	}
 }
 

@@ -48,6 +48,14 @@ class PageStoreMap<T> {
 		]);
 	}
 
+	protected update(id: string, predicate: (item: T) => boolean, update: (item: T) => T): void {
+		const currentItems = this.get(id);
+		const updatedItems = currentItems.map(item => 
+			predicate(item) ? update(item) : item
+		);
+		this.store.setKey(id, updatedItems);
+	}
+
 	protected erase(id: string, predicate: (item: T) => boolean) {
 		const filtered = this.get(id).filter(predicate);
 		this.store.setKey(id, filtered);

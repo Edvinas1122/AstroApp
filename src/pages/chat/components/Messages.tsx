@@ -1,7 +1,7 @@
 import styles from './Chat.module.css'
 import { useEffect, useRef } from "preact/hooks";
-import {messages,  members, chats, $invite_modal, $createChat_modal, route} from "../../../chatStore";
-import type { Message, Chat } from '../../../chatStore';
+import {messages, members, chats, $invite_modal, $createChat_modal, route} from "../../../chatStore";
+import type { Message, Chat, Member } from '../../../chatStore';
 import { useStore } from "@nanostores/preact";
 
 type ChatReq = {
@@ -18,7 +18,7 @@ function useLiveChat() {
 		messages.fetch(id);
 	}, [id]);
 
-	return {members: _members, _messages, id}
+	return {_members, _messages, id}
 }
 import type { VNode } from 'preact';
 
@@ -60,10 +60,22 @@ const ListBox = ({ header, children, footer, class: className = '', width }: Lis
     </div>
 );
 
+
+const MemberC = ({item, children}:{item: Member, children?: ChildNode}) => (
+	<div>
+		<img style={{
+			height: "30px",
+			borderRadius: "100%"
+		}} src={item.user.picture}/>
+		{item.user.given_name}
+		{children}
+	</div>
+)
+
 import { createFormAction } from '../../../ui/utils';
 
 export function ChatDisplay({email}: ChatReq) {
-	const {members, _messages, id} = useLiveChat();
+	const {_members, _messages, id} = useLiveChat();
 	const chatEndRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
@@ -75,7 +87,7 @@ export function ChatDisplay({email}: ChatReq) {
     };
 
 	function selectMember(id: string) {
-		return members.find((item) => item.ch_member.id === id)?.user;
+		return _members.find((item) => item.ch_member.id === id)?.user;
 	}
 
 	function renderMessage(message: Message) {
@@ -96,6 +108,22 @@ export function ChatDisplay({email}: ChatReq) {
 	const submit = createFormAction(['content'], ({content}) => {
 		messages.send({id, content});
 	})
+
+
+
+	const admins = _members.filter(memb => memb.ch_member.role === 'admin');
+	const participants = _members.filter(memb => memb.ch_member.role === 'participant');
+	const invited = _members.filter(memb => memb.ch_member.role === 'invited');
+
+	const my_role = _members.find((memb) => memb.user.email === email)?.ch_member.role
+
+	// if (!my_role) return null;
+
+	const renderAdmin = (item: Member) => (
+		<MemberC item={item}/>
+	)
+
+	// const renderPar
 
 	return (
 		<>
@@ -127,19 +155,24 @@ export function ChatDisplay({email}: ChatReq) {
 				header={<>Members</>}
 				footer={
 				<>
-				<a onClick={() => $invite_modal.set(true)}>Invite users</a>
+					<a onClick={() => $invite_modal.set(true)}>Invite users</a>
 				</>
 				}
 			>
-				{members.map((item) => (
-					<div>
-						<img style={{
-							height: "30px",
-							borderRadius: "100%"
-						}} src={item.user.picture}/>
-						{`${item.user.given_name} - ${item.ch_member.role}`}
-					</div>
-				))}
+				<>
+				<section>
+					<p>Admin</p>
+					{admins.map(renderAdmin)}
+				</section>
+				{!!participants.length && <section>
+					<p>Participants</p>
+					{participants.map(renderAdmin)}
+				</section>}
+				{!!invited.length && <section>
+					<p>Invited</p>
+					{invited.map(renderAdmin)}
+				</section>}
+				</>
 			</ListBox>
 		</>
 	);
@@ -183,7 +216,7 @@ function ChatList({email}: ChatListProps) {
 		chats.fetch('default');
 	}, [email])
 
-	function renderChat(item: Chat) {
+	const renderChat = (interact: (id: string) => VNode) => (item: Chat) => {
 		const id = item.chat.id;
 		return (
 			<div>
@@ -192,12 +225,28 @@ function ChatList({email}: ChatListProps) {
 				>
 					<div>{item.chat.name}</div>
 				</a>
-				<button
-					onClick={() => chats.delete({id})}
-				>X</button>
+				{interact(id)}
 			</div>
 		)
 	}
+
+	const myChats = _chats.filter(chat => chat.ch_member.role === 'admin');
+	const participantChats = _chats.filter(chat => chat.ch_member.role === 'participant');
+	const invited = _chats.filter(chat => chat.ch_member.role === 'invited');
+
+	const renderMyChat = renderChat((id) =>	
+		<button
+			onClick={() => chats.delete({id})}
+		>Delete</button>
+	);
+
+	const renderInvitedChats = renderChat((id) => <div>
+		<button
+			onClick={() => chats.accept({id})}
+		>
+
+		</button>
+	</div>)
 
 	return (
 		<>
@@ -208,7 +257,18 @@ function ChatList({email}: ChatListProps) {
 					<button onClick={() => $createChat_modal.set(true)}>Create Chat</button>
 				}>
 				<main className={styles.msgerChat}>
-					{_chats.map(renderChat)}
+					{!!invited.length && <section>
+						<p>Invited</p>
+						{invited.map(renderMyChat)}
+					</section>}
+					{!!myChats.length && <section>
+						<p>My Chats</p>
+						{myChats.map(renderMyChat)}
+					</section>}
+					{!!participantChats.length && <section>
+						<p>Participant</p>
+						{participantChats.map(renderMyChat)}
+					</section>}
 					<div ref={chatEndRef}/>
 				</main>
 			</ListBox>

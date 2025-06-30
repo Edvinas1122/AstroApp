@@ -1,4 +1,4 @@
-import { MessageSchema, type Message } from "./ws.schema";
+import { MessageSchema, type Message, type Invite } from "./ws.schema";
 
 type Handler = (ws: WebSocket, message: any) => any
 
@@ -9,11 +9,16 @@ handlers.set('system', (ws, m) => {
 });
 
 
-import { messages, members } from "./chatStore";
+import { messages, members, chats } from "./chatStore";
 
 handlers.set('chat', (ws, m: Message['content']) => {
 	messages.receive(m);
 	// chat.set(m.message.chat, m.message)
+})
+
+handlers.set('invite', (ws, m: Invite['content']) => {
+	alert(`invited into a chat - ${m.chat}, by ${m.by}`);
+	chats.fetch('default');
 })
 
 // import { AtomWebSocket } from "./utils/socket";

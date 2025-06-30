@@ -1,4 +1,4 @@
-import { z } from 'astro:schema';
+import { z, type ZodTypeAny, ZodObject, ZodString } from 'astro:schema';
 import type { ChatService } from '../../../api/src';
 import { createServiceActionBuilder } from "./utils";
 
@@ -11,6 +11,15 @@ const paginate = z.object({
 	page: z.number()
 })
 
+const one = <T extends Record<string, ZodTypeAny>>(props: T): ZodObject<{
+  id: ZodString;
+} & T> => {
+  return z.object({
+    id: z.string(),
+    ...props,
+  });
+};
+
 export const chat = {
 	chats: chatAction(paginate, async (input, {service, email}) => {
 		return await service.list(email);
@@ -20,21 +29,25 @@ export const chat = {
 	}), async (input, {service, email}) => {
 		return await service.create(email, input.name);
 	}),
-	delete: chatAction(z.object({id: z.string()}), async (input, {service, email}) => {
+	delete: chatAction(one({}), async (input, {service, email}) => {
 		return await service.delete(email, input.id);
 	}),
 	messages: chatAction(paginate, async (input, {service, email}) => {
 		return await service.messages(email, input.id);
 	}),
-	send: chatAction(z.object({id: z.string(), content: z.string()}),
+	send: chatAction(one({content: z.string()}),
 		async (input, {service, email}) => {
 			return await service.send(email, input.id, input.content);
 	}),
 	members: chatAction(paginate, async (input, {service, email}) => {
 			return await service.members(email, input.id);
 	}),
-	invite: chatAction(z.object({id: z.string(), user: z.string()}),
+	invite: chatAction(one({user: z.string()}),
 		async (input, {service, email}) => {
-			return await service.sign(email, input.id, input.user);
+			return await service.invite(email, input.id, input.user);
+	}),
+	accept: chatAction(one({
+	}), async (input, {service, email}) => {
+		return await service.accept(email, input.id)
 	})
 }

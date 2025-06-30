@@ -33,11 +33,12 @@ class PageStoreMap<T> {
 	}
 
 	// Set single item
-	protected set(id: string, item: T): void {
+	protected set(id: string, item: T): T {
 		this.store.setKey(id, [
 			...this.get(id),
 			item
 		]);
+		return item;
 	}
 
 	// Set multiple items

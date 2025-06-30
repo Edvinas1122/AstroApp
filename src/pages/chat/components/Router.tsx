@@ -11,13 +11,19 @@ function VirtualRouter({ children }: VirtualRouterProps) {
 			.filter(segment => segment.length)
 			.map(decodeURIComponent)
 		route.set(location())
+
 		const originalPushState = window.history.pushState;
+		const originalReplaceState = window.history.replaceState;
 
 		window.history.pushState = function (...args) {
 			originalPushState.apply(this, args);
-			console.log(location())
 			route.set(location());
 		};
+
+		window.history.replaceState = function (...args) {
+			originalReplaceState.apply(this, args);
+			route.set(location());
+		}
 
 		const handlePopState = () => {
 			route.set(location());
@@ -26,7 +32,8 @@ function VirtualRouter({ children }: VirtualRouterProps) {
 
 		return () => {
 			window.removeEventListener("popstate", handlePopState);
-			window.history.pushState = originalPushState; // Restore original pushState
+			window.history.pushState = originalPushState;
+			window.history.replaceState = originalReplaceState;
 		};
 	}, []);
 

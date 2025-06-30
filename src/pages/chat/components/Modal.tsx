@@ -1,7 +1,7 @@
 import { useStore } from "@nanostores/preact";
 import { $invite_modal, members, route } from "../../../chatStore";
 import { Modal} from "../../../ui/Material";
-import { useEffect, useState } from "preact/hooks";
+import { useEffect, useState, useRef } from "preact/hooks";
 import { actions } from "astro:actions";
 import { createFormAction } from "../../../ui/utils";
 import {
@@ -19,11 +19,27 @@ type User = {
     signed: string | null;
 }
 
+function withFocus(open: boolean) {
+	const focusRef = useRef<HTMLInputElement & HTMLSelectElement>(null);
+
+	useEffect(() => {
+		if (open) focusRef.current?.focus();
+	}, [open]);
+
+	return focusRef;
+}
 
 export function InviteModal() {
 	const id = useStore(route)[1];
 	const open = useStore($invite_modal);
+	const focusRef = withFocus(open);
 	const [users, setUsers] = useState<User[]>([]);
+
+	const submit = createFormAction(['email'], ({email}, reset) => {
+		members.invite({id, user: email}).then(memb => {
+			$invite_modal.set(false); reset();
+		})
+	})
 
 	useEffect(() => {
 		if (open) {
@@ -35,12 +51,6 @@ export function InviteModal() {
 		}
 	}, [open]);
 
-
-	const submit = createFormAction(['email'], ({email}) => {
-		members.invite({id, user: email});
-		$invite_modal.set(false);
-	})
-
 	return (
 		<Modal
 			isOpen={open}
@@ -48,7 +58,7 @@ export function InviteModal() {
 			close={() => $invite_modal.set(false)}
 		>
 			<form onSubmit={submit}>
-				<select name="email">
+				<select name="email" disabled={submit.loading} ref={focusRef}>
 					{
 						users.map((item) => (
 								<option value={item.email}>
@@ -57,20 +67,22 @@ export function InviteModal() {
 						))
 					}
 				</select>
-				<button type="submit">Add</button>
+				<button type="submit" disabled={submit.loading}>Add</button>
 			</form>
 		</Modal>
 	);
 }
 
-
-
 export function CreateChatModal() {
 	const open = useStore($createChat_modal);
+	const focusRef = withFocus(open);
 
-	const submit = createFormAction(['name'], (input) => {
-		chats.create(input)
-		$createChat_modal.set(false);
+	const submit = createFormAction(['name'], (input, reset) => {
+		chats.create(input).then(chat => {
+			$createChat_modal.set(false);
+			window.history.pushState({}, '', `/chat/${chat.chat.id}`)
+			reset();
+		})
 	});
 
 	return (
@@ -82,38 +94,13 @@ export function CreateChatModal() {
 			<form onSubmit={submit}>
 				<input type="text" name='name' placeholder='type name here...'
 					maxLength={15} minLength={3}
+					disabled={submit.loading}
+					ref={focusRef}
 				/>
-				<button type="submit">Create</button>
+				<button type="submit" disabled={submit.loading}>
+					Create
+				</button>
 			</form>
 		</Modal>
 	);
 }
-
-// import type { PreinitializedWritableAtom } from "nanostores";
-
-// function buildWarningModal(
-// 	message: string,
-// 	title: string,
-// 	action: () => void,
-// 	$open: PreinitializedWritableAtom<boolean> & object
-// ) {
-// 	return () => {
-// 		const open = useStore($open);
-
-// 		const agree = () => {
-// 			action();
-// 			$open.set(false)
-// 		}
-
-// 		return (
-// 			<Modal
-// 				isOpen={open}
-// 				close={() => $open.set(false)}
-// 				header={<h2>{title}</h2>}
-// 			>
-// 				<p>{message}</p>
-// 				<button onClick={agree}>Continue</button>
-// 			</Modal>
-// 		)
-// 	}
-// }

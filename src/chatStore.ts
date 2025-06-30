@@ -55,19 +55,18 @@ function handleResult<T>(result: SafeResult<any, any>) {
 	return result.data as T;
 }
 
-function onSuccess(handler: <T>(data: T) => void) {
+function onSuccess<T, RET>(handler: (data: T) => RET) {
 	return (result: SafeResult<any, any>) => {
 		const data = handleResult(result);
-		return handler(data);
+		return handler(data as T);
 	}
 }
 
 class MemberStore extends PageStore<Member> {
-	invite(input: Parameters<typeof actions.chat.invite>[0]) {
-		actions.chat.invite(input).then(onSuccess((data) => {
-			console.log('setting', data);
-			this.set(input.id, data as Member)
-		}))
+	async invite(input: Parameters<typeof actions.chat.invite>[0]) {
+		return actions.chat.invite(input).then(onSuccess(
+			(data: Member) => this.set(input.id, data)
+		))
 	}
 
 	// accept(input: Parameters<typeof actions.chat.accept>[0]) {
@@ -95,11 +94,10 @@ function formatDate(date: Date) {
 
 class MessageStore extends PageStore<Message> {
 	send(input: Parameters<typeof actions.chat.send>[0]) {
-		actions.chat.send(input).then(result => {
-			console.log('sent message:', result);
-			if (result.error) throw new Error(result.error.message);
-			this.set(input.id, {...result.data, sent: formatDate(new Date())} as Message);
-		})
+		actions.chat.send(input)
+		.then(onSuccess((data: Message) => this.set(input.id, 
+			{...data, sent: formatDate(new Date())}
+		)))
 	}
 	
 	receive(message: Message) {
@@ -122,16 +120,15 @@ class ChatStore extends PageStore<Chat> {
 
 	public key = 'default'
 
-	create(input: Parameters<typeof actions.chat.create>[0]) {
-		actions.chat.create(input).then(response => {
-			const parsed = handleResult<Chat>(response);
-			this.set(this.key, parsed);
-		});
+	async create(input: Parameters<typeof actions.chat.create>[0]) {
+		return actions.chat.create(input)
+		.then(onSuccess((data: Chat) => this.set(this.key, data)))
 	}
 
-	delete(input: Parameters<typeof actions.chat.delete>[0]) {
-		actions.chat.delete(input).then((result) => {
+	async delete(input: Parameters<typeof actions.chat.delete>[0]) {
+		return actions.chat.delete(input).then((result) => {
 			this.erase(this.key, (item) => item.chat.id !== input.id);
+			return true;
 		})
 	}
 

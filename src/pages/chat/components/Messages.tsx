@@ -8,20 +8,7 @@ type ChatReq = {
 	email: string, // current user email
 };
 
-function useLiveChat() {
-	const id = useStore(route)[1];
-	const _members = useStore(members.$store)[id] || []
-	const _messages = useStore(messages.$store)[id] || [];
 
-	useEffect(() => {
-		if (id) {
-			members.fetch(id);
-			messages.fetch(id);
-		}
-	}, [id]);
-
-	return {_members, _messages, id}
-}
 import type { VNode } from 'preact';
 
 interface ListBoxProps {
@@ -62,6 +49,15 @@ const ListBox = ({ header, children, footer, class: className = '', width }: Lis
     </div>
 );
 
+interface CenterProps {
+	children: VNode
+}
+
+const Center = ({children}: CenterProps) => (
+	<div style="display: flex; justify-content: center; align-items: center; height: 200px;">
+		{children}
+	</div>
+);
 
 const MemberC = ({item, children}:{item: Member, children?: ChildNode}) => (
 	<div>
@@ -74,10 +70,32 @@ const MemberC = ({item, children}:{item: Member, children?: ChildNode}) => (
 	</div>
 )
 
-import { createFormAction } from '../../../ui/utils';
+import { createButtonEvent, createFormAction } from '../../../ui/utils';
+
+function isPermitableChat(id: string) {
+	const _chats = useStore(chats.$store)['default'] || [];
+
+	return !!_chats.filter(c => c.chat.id === id).length
+}
+
+function useLiveChat() {
+	const id = useStore(route)[1];
+	const permited = isPermitableChat(id);
+	const _members = useStore(members.$store)[id] || []
+	const _messages = useStore(messages.$store)[id] || [];
+
+	useEffect(() => {
+		if (id && permited) {
+			members.fetch(id);
+			messages.fetch(id);
+		}
+	}, [id, permited]);
+
+	return {_members, _messages, id, permited}
+}
 
 export function ChatDisplay({email}: ChatReq) {
-	const {_members, _messages, id} = useLiveChat();
+	const {_members, _messages, id, permited} = useLiveChat();
 	const chatEndRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
@@ -107,11 +125,11 @@ export function ChatDisplay({email}: ChatReq) {
 		/>;
 	}
 
-	const submit = createFormAction(['content'], ({content}) => {
-		messages.send({id, content});
+	const submit = createFormAction(['content'], ({content}, reset) => {
+		messages.send({id, content}); reset();
 	})
 
-
+	const _name = id && id.split(':').filter(a => a.length)[0]
 
 	const admins = _members.filter(memb => memb.ch_member.role === 'admin');
 	const participants = _members.filter(memb => memb.ch_member.role === 'participant');
@@ -127,7 +145,7 @@ export function ChatDisplay({email}: ChatReq) {
 		<>
 		<ListBox
 			width='1000px'
-			header={<><i class="fas fa-comment-alt"></i> Chat</>}
+			header={<><i class="fas fa-comment-alt"></i>{`${_name} - chat`}</>}
 			footer={
 				<form className={styles.msgerInputarea} onSubmit={submit}>
 					<textarea name="content" placeholder="Enter your message..." 
@@ -143,19 +161,18 @@ export function ChatDisplay({email}: ChatReq) {
 				{!!_messages.length ? <main className={styles.msgerChat}>
 					{_messages.map(renderMessage)}
 					<div ref={chatEndRef}/>
-				</main> : (<div><p>🧙 Epic chat starts with a message ✉️</p></div>)}
+				</main> : (<Center><p>{`🧙 Epic ${_name} chat starts with a message ✉️`}</p></Center>)}
 		</ListBox>
 		<ListBox
 			width='200px'
 			header={<>Members</>}
 			footer={
 				<>
-					<a onClick={() => $invite_modal.set(true)}>Invite users</a>
+					<button onClick={() => $invite_modal.set(true)}>Invite users</button>
 				</>
 			}
 		>
-			<>
-			<section>
+			{_members.length > 1 ? <><section>
 				<p>Admin</p>
 				{admins.map(renderAdmin)}
 			</section>
@@ -166,8 +183,7 @@ export function ChatDisplay({email}: ChatReq) {
 			{!!invited.length && <section>
 				<p>Invited</p>
 				{invited.map(renderAdmin)}
-			</section>}
-			</>
+			</section>}</> : (<Center><p>Invite wonderers to chat with them</p></Center>)}
 		</ListBox>
 		</>
 	)
@@ -177,7 +193,8 @@ export function ChatDisplay({email}: ChatReq) {
 			<ChatList
 				email={email}
 			/>
-			{id ? ChatPort : (<div><p>Start chat by selecting or creating one</p></div>)}
+			{id ? !permited ? (<Center><p>404 Not Found</p></Center>) : ChatPort : (<Center><p>Start chat by selecting or creating one</p></Center>)
+			}
 		</>
 	);
 }
@@ -215,20 +232,35 @@ interface ChatListProps {
 function ChatList({email}: ChatListProps) {
 	const _chats = useStore(chats.$store)['default'] || [];
 	const chatEndRef = useRef<HTMLDivElement>(null);
-
+	const currentSelect = useStore(route)[1];
+	
 	useEffect(() => {
 		chats.fetch('default');
 	}, [email])
 
+
 	const renderChat = (interact: (id: string) => VNode) => (item: Chat) => {
 		const id = item.chat.id;
+		const selected = id === currentSelect;
+		const link = () => window.history.pushState({}, '', `/chat/${id}`);
+		// const link = () => window.history.replaceState({}, '', '/chat')
 		return (
-			<div>
-				<a 
-					onClick={() => window.history.pushState({}, '', `/chat/${id}`)}
-				>
+			<div
+				style={{
+					boxShadow: selected ? '0 0 0 2px #3b82f6' : 'none',
+					backgroundColor: selected ? '#eff6ff' : 'transparent',
+					borderRadius: '8px',
+					padding: '12px',
+					margin: '4px 0',
+					transition: 'all 0.2s ease',
+					cursor: 'pointer',
+					// Add other styles as needed
+				}}
+				onClick={link}
+			>
+				<p>
 					<div>{item.chat.name}</div>
-				</a>
+				</p>
 				{interact(id)}
 			</div>
 		)
@@ -238,11 +270,22 @@ function ChatList({email}: ChatListProps) {
 	const participantChats = _chats.filter(chat => chat.ch_member.role === 'participant');
 	const invited = _chats.filter(chat => chat.ch_member.role === 'invited');
 
-	const renderMyChat = renderChat((id) =>	
-		<button
-			onClick={() => chats.delete({id})}
-		>Delete</button>
-	);
+	const renderMyChat = renderChat((id) =>	{
+		const action = createButtonEvent((e, reset) => {
+			e.stopPropagation();
+			chats.delete({id}).then(() => {
+				reset();
+				if (currentSelect === id) {
+					window.history.replaceState({}, '', '/chat')
+				}
+			})
+		})
+		return	<button
+					disabled={action.loading}
+					onClick={action}
+			>Delete</button>
+		
+	});
 
 	const renderInvitedChats = renderChat((id) => <div>
 		<button

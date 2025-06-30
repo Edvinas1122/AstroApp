@@ -1,5 +1,5 @@
 import { useStore } from "@nanostores/preact";
-import { $invite_modal } from "../../../chatStore";
+import { $invite_modal, route } from "../../../chatStore";
 import { Modal} from "../../../ui/Material";
 import { useEffect, useState } from "preact/hooks";
 import { actions } from "astro:actions";
@@ -15,13 +15,9 @@ type User = {
     signed: string | null;
 }
 
-type InviteModalProps = {
-	id: string,
-}
 
-
-
-export function InviteModal({id}: InviteModalProps) {
+export function InviteModal() {
+	const id = useStore(route);
 	const open = useStore($invite_modal);
 	const [users, setUsers] = useState<User[]>([]);
 

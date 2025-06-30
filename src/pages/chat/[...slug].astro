@@ -51,16 +51,14 @@ console.log("chat:",slug)
 				client:load
 				> -->
 				<InviteModal
-					id={slug}
 					client:load
 				/>
 				<CreateChatModal
 					client:load
 				/>
 				<ChatDisplay
-				id={slug}
-				email={user_email}
-				client:load
+					email={user_email}
+					client:load
 				/>
 			<div>
 		</Socket>

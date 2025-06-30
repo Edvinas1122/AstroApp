@@ -5,7 +5,6 @@ import type { Message, Chat } from '../../../chatStore';
 import { useStore } from "@nanostores/preact";
 
 type ChatReq = {
-	id: string,
 	email: string, // current user email
 };
 

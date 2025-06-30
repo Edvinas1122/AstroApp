@@ -17,7 +17,7 @@ type User = {
 
 
 export function InviteModal() {
-	const id = useStore(route);
+	const id = useStore(route)[1];
 	const open = useStore($invite_modal);
 	const [users, setUsers] = useState<User[]>([]);
 

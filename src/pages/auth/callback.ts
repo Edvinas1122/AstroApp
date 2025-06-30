@@ -29,7 +29,7 @@ export const GET: APIRoute = withError(
 		const user = validate(await Auth.google(context.request.url));
 		const token = validate(await User.sign(user)).token;
 
-		const redirect_path = '/';
+		const redirect_path = '/chat';
 		const respond = new Response("", {status: 302});
 		respond.headers.append('Set-Cookie', cookie(token).join(";"));
 		respond.headers.append('Location', `${redirect_path}?authStatus=completed`);

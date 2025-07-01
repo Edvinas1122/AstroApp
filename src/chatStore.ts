@@ -132,8 +132,8 @@ class ChatStore extends PageStore<Chat> {
 		})
 	}
 
-	accept(input: Parameters<typeof actions.chat.accept>[0]) {
-		actions.chat.accept(input).then(onSuccess((data: unknown) => {
+	async accept(input: Parameters<typeof actions.chat.accept>[0]) {
+		return actions.chat.accept(input).then(onSuccess((data: unknown) => {
 			this.update(this.key,
 				(chat) => chat.chat.id === input.id,
 				(chat) => ({...chat, ch_member: {...chat.ch_member, role: 'participant'}}))

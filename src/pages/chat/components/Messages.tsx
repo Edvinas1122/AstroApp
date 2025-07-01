@@ -5,7 +5,7 @@ import type { Message, Chat, Member } from '../../../chatStore';
 import { useStore } from "@nanostores/preact";
 
 type ChatReq = {
-	email: string, // current user email
+	email: string,
 };
 
 
@@ -36,11 +36,9 @@ const ListBox = ({ header, children, footer, class: className = '', width }: Lis
                 )}
             </header>
         )}
-        
         <main class={styles.msgerChat}>
             {children}
         </main>
-        
         {footer && (
             <footer class={styles.msgerInputArea}>
                 {footer}
@@ -209,20 +207,20 @@ type MessageProps = {
 }
 
 const Message = ({ name, picture, sent, content, my }: MessageProps) => (
-    <div className={`${styles.msg} ${my ? styles.rightMsg : styles.leftMsg}`}>
-        <img
+	<div className={`${styles.msg} ${my ? styles.rightMsg : styles.leftMsg}`}>
+		<img
 			class={styles.msgImg}
 			src={picture}
 			alt={name}
 		/>
 		<div className={styles.msgBubble}>
 			<div class={styles.msgInfo}>
-        		<div class={styles.msgInfoName}>{name}</div>
-        		<div class={styles.msgInfoTime}>{sent}</div>
-        	</div>
-        	<div class={styles.msgText}>{content}</div>
+				<div class={styles.msgInfoName}>{name}</div>
+				<div class={styles.msgInfoTime}>{sent}</div>
+			</div>
+			<div class={styles.msgText}>{content}</div>
 		</div>
-    </div>
+	</div>
 );
 
 interface ChatListProps {
@@ -243,7 +241,6 @@ function ChatList({email}: ChatListProps) {
 		const id = item.chat.id;
 		const selected = id === currentSelect;
 		const link = () => window.history.pushState({}, '', `/chat/${id}`);
-		// const link = () => window.history.replaceState({}, '', '/chat')
 		return (
 			<div
 				style={{
@@ -289,11 +286,15 @@ function ChatList({email}: ChatListProps) {
 
 	const renderInvitedChats = renderChat((id) => <div>
 		<button
-			onClick={() => chats.accept({id})}
-		>
+			onClick={() => chats.accept({id}).then(e => {
 
+			})}
+		>
+			Accept
 		</button>
 	</div>)
+
+
 
 	return (
 		<>
@@ -305,15 +306,15 @@ function ChatList({email}: ChatListProps) {
 				}>
 				<main className={styles.msgerChat}>
 					{!!invited.length && <section>
-						<p>Invited</p>
-						{invited.map(renderMyChat)}
+						<p>{`Invited (${invited.length})`}</p>
+						{invited.map(renderInvitedChats)}
 					</section>}
 					{!!myChats.length && <section>
-						<p>My Chats</p>
+						<p>{`My Chats (${myChats.length})`}</p>
 						{myChats.map(renderMyChat)}
 					</section>}
 					{!!participantChats.length && <section>
-						<p>Participant</p>
+						<p>{`Participants (${participantChats.length})`}</p>
 						{participantChats.map(renderMyChat)}
 					</section>}
 					<div ref={chatEndRef}/>

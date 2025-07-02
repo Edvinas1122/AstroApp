@@ -38,6 +38,7 @@ function useReconnect(
 	delayS: number = 5,
 	reconnectCount: number = 3,
 	delayAfterCountS: number = 60,
+	maxReconnectCount: number = 15
 ) {
 	const [count, setCount] = useState(0);
 	const [works, setWorks] = useState(true);
@@ -64,16 +65,20 @@ function useReconnect(
 	}
 
 	useEffect(() => {
-		if (!works) {
-			const timmer = setTimeout(() => {
-				connect()
-					.then(updateState)
-					.catch(errorBehaviour)
-			}, delaySetMS())
-			return () => {
-				console.log("clear attempt countdown")
-				clearTimeout(timmer)
-			} 
+		if (maxReconnectCount > count) {
+			if (!works) {
+				const timmer = setTimeout(() => {
+					connect()
+						.then(updateState)
+						.catch(errorBehaviour)
+				}, delaySetMS())
+				return () => {
+					console.log("clear attempt countdown")
+					clearTimeout(timmer)
+				} 
+			}
+		} else {
+			console.log('max reconnect count exceeded');
 		}
 	}, [connect, works])
 	

@@ -18,7 +18,8 @@ function createServiceActionBuilder<Service>(
 				try {
 					return await handler(input, { email, service, context });
 				} catch (error: any) {
-					return {error: error.message}
+					throw new Error(JSON.stringify({error: error.message}));
+					// return {error: error.message}
 				}
 			},
 		} as { input: Schema; handler: ActionHandler<Schema, unknown> });

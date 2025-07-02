@@ -50,8 +50,12 @@ import { atom } from "nanostores";
 
 
 function handleResult<T>(result: SafeResult<any, any>) {
-	if (result.error) throw new Error("failed to fetch:", result.error);
-	console.log('handling store result:', result.data);
+	console.log('before')
+	if (result.error) {
+		console.log('error occured');
+		throw new Error("failed to fetch:", result.error);
+	}
+	console.log('after', result);
 	return result.data as T;
 }
 
@@ -98,22 +102,38 @@ function formatDate(date: Date) {
     .replace(/\.\d{3}Z$/, '');
 }
 
+const set_rand_id = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+
+
 class MessageStore extends PageStore<Message & {}> {
 	send(input: Parameters<typeof actions.chat.send>[0], me: string) {
+
 		const me_member = members.me(input.id, me);
-		const rand_id = 'awaiting-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+		const rand_id = 'awaiting-' + set_rand_id()
+
 		this.set(input.id, {
 			id: rand_id,
 			chat: input.id,
 			member: me_member.ch_member.id,
-			sent: formatDate(new Date()),
+			// sent: formatDate(new Date()),
+			sent: 'sending...',
 			content: input.content
 		})
+
+		const update = (method: (data: Message) => Message) => this.update(input.id,
+			(m) => m.id === rand_id,
+			method
+		)
+
+		const timeout = setTimeout(() => {
+			console.log('send timmed out');
+			update((message) => ({...message, sent: 'timmed out'}))
+		}, 10000);
+		
 		actions.chat.send(input)
-			.then(onSuccess((data: Message) => this.update(input.id,
-				(m) => m.id === rand_id,
-				() => data
-			)))
+			.then(onSuccess((data: Message) => update(() => data)))
+			.catch((reason) => update((data) => ({...data, sent: 'failed'})))
+			.finally(() => clearTimeout(timeout))
 	}
 	
 	receive(message: Message) {

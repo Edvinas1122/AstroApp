@@ -34,6 +34,7 @@ export function InviteModal() {
 	const open = useStore($invite_modal);
 	const focusRef = withFocus(open);
 	const [users, setUsers] = useState<User[]>([]);
+	const [online, setOnline] = useState(0);
 
 	const submit = createFormAction(['email'], ({email}, reset) => {
 		members.invite({id, user: email}).then(memb => {
@@ -43,6 +44,10 @@ export function InviteModal() {
 
 	useEffect(() => {
 		if (open) {
+			actions.user.online({}).then(result => {
+				console.log(result);
+				setOnline(result.data);
+			})
 			actions.user.search({query: ''}).then(result => {
 				console.log(result.data);
 				if (result.error) throw new Error('failed users fetch');
@@ -51,10 +56,17 @@ export function InviteModal() {
 		}
 	}, [open]);
 
+	const Header = (
+		<>
+			<h2>Invite a user</h2>
+			<p>currently online {online}</p>
+		</>
+		)
+
 	return (
 		<Modal
 			isOpen={open}
-			header={<h2>Invite a user</h2>}
+			header={Header}
 			close={() => $invite_modal.set(false)}
 		>
 			<form onSubmit={submit}>

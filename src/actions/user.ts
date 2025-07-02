@@ -1,18 +1,24 @@
 import { defineAction } from "astro:actions";
 import { z } from 'astro:schema';
-import type { UserService } from '../../../api/src';
+import type { UserService, SocketUtilsService } from '../../../api/src';
+import { createServiceActionBuilder } from "./utils";
+
+const userAction = createServiceActionBuilder<UserService>(
+	(context) => context.locals.runtime.env.User
+)
+
+const socketAction = createServiceActionBuilder<SocketUtilsService>(
+	(c) => c.locals.runtime.env.WebSocket
+)
 
 export const user = {
-	search: defineAction({
-		input: z.object({
+	search: userAction(
+		z.object({
 			query: z.string()
-		}),
-		handler: async (input, context) => {
-			const user = context.locals.runtime.env.User as  unknown as UserService;
-			const email = context.locals.user.email;
-
-			const data = await user.list();
-			return data;
-		}
-	})
+		}), 
+		async ({query}, {service}) => await service.list()
+	),
+	online: socketAction(z.object({}),
+		async (_, {service}) => await service.onlineCount()
+	)
 }

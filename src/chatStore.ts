@@ -7,6 +7,8 @@ export type Message = {
 }
 
 export type Member = {
+	online: boolean | undefined,
+	last_seen: number | undefined,
 	ch_member: {
 		id: string;
 		chat: string;

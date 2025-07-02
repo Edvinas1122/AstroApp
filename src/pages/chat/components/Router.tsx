@@ -5,7 +5,7 @@ interface VirtualRouterProps {
 	children: ChildNode
 }
 
-function VirtualRouter({ children }: VirtualRouterProps) {
+function withRouter() {
 	useEffect(() => {
 		const location = () => window.location.pathname.split('/')
 			.filter(segment => segment.length)
@@ -36,6 +36,29 @@ function VirtualRouter({ children }: VirtualRouterProps) {
 			window.history.replaceState = originalReplaceState;
 		};
 	}, []);
+}
+
+function withFetchRedirect() {
+	useEffect(() => {
+		const originalFetch = window.fetch;
+
+		window.fetch = async (...args) => {
+			const response = await originalFetch(...args);
+
+			if (response.status === 401) {
+				window.location.href = '/auth';
+			}
+
+			return response;
+		};
+		return () => window.fetch = originalFetch;
+	}, [])
+}
+
+function VirtualRouter({ children }: VirtualRouterProps) {
+
+	withRouter();
+	withFetchRedirect();
 
 	return <>{children}</>;
 }

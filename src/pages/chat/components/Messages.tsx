@@ -57,16 +57,46 @@ const Center = ({children}: CenterProps) => (
 	</div>
 );
 
-const MemberC = ({item, children}:{item: Member, children?: ChildNode}) => (
-	<div>
-		<img style={{
-			height: "30px",
-			borderRadius: "100%"
-		}} src={item.user.picture}/>
-		{item.user.given_name}
-		{children}
-	</div>
-)
+const MemberC = ({ item, children }: { item: Member, children?: React.ReactNode }) => (
+  <div style={{
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+    padding: '5px 0'
+  }}>
+    {/* Avatar with online status */}
+    <div style={{ position: 'relative' }}>
+      <img
+        src={item.user.picture}
+        alt={item.user.given_name}
+        style={{
+          height: '30px',
+          width: '30px',
+          borderRadius: '100%',
+          objectFit: 'cover'
+        }}
+      />
+      {/* Online Indicator Dot */}
+      <span style={{
+        position: 'absolute',
+        bottom: 0,
+        right: 0,
+        width: '8px',
+        height: '8px',
+        borderRadius: '50%',
+        backgroundColor: item.online ? 'limegreen' : 'gray',
+        border: '1px solid white'
+      }} />
+    </div>
+
+    {/* Name and optional children */}
+    <div>
+      <div>{item.user.given_name}</div>
+      {children}
+    </div>
+  </div>
+);
+
 
 import { createButtonEvent, createFormAction } from '../../../ui/utils';
 

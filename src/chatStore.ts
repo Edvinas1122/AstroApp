@@ -69,6 +69,12 @@ class MemberStore extends PageStore<Member> {
 		))
 	}
 
+	me(chat_id: string, email: string) {
+		const member = this.find(chat_id, (m) => m.user.email === email);
+		if (!member) throw new Error('not a chat member');
+		return member;
+	}
+
 	// accept(input: Parameters<typeof actions.chat.accept>[0]) {
 	// 	actions.chat.accept(input).then(onSuccess((data: unknown) => {
 	// 		this.update(input.id,
@@ -92,12 +98,22 @@ function formatDate(date: Date) {
     .replace(/\.\d{3}Z$/, '');
 }
 
-class MessageStore extends PageStore<Message> {
-	send(input: Parameters<typeof actions.chat.send>[0]) {
+class MessageStore extends PageStore<Message & {}> {
+	send(input: Parameters<typeof actions.chat.send>[0], me: string) {
+		const me_member = members.me(input.id, me);
+		const rand_id = 'awaiting-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+		this.set(input.id, {
+			id: rand_id,
+			chat: input.id,
+			member: me_member.ch_member.id,
+			sent: formatDate(new Date()),
+			content: input.content
+		})
 		actions.chat.send(input)
-		.then(onSuccess((data: Message) => this.set(input.id, 
-			{...data, sent: formatDate(new Date())}
-		)))
+			.then(onSuccess((data: Message) => this.update(input.id,
+				(m) => m.id === rand_id,
+				() => data
+			)))
 	}
 	
 	receive(message: Message) {

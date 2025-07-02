@@ -124,7 +124,7 @@ export function ChatDisplay({email}: ChatReq) {
 	}
 
 	const submit = createFormAction(['content'], ({content}, reset) => {
-		messages.send({id, content}); reset();
+		messages.send({id, content}, email); reset();
 	})
 
 	const _name = id && id.split(':').filter(a => a.length)[0]

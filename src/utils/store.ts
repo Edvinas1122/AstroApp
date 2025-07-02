@@ -32,6 +32,10 @@ class PageStoreMap<T> {
 		return this.store.get()[id] || [];
 	}
 
+	find(id: string, predicate: (item: T) => boolean) {
+		return this.get(id).find(predicate);
+	}
+
 	// Set single item
 	protected set(id: string, item: T): T {
 		this.store.setKey(id, [

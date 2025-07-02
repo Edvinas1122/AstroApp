@@ -22,11 +22,10 @@ const cookie = (token: string) => [
 
 export const GET: APIRoute = withError(
 	async (context, {validate}) => {
-		
 		const Auth = context.locals.runtime.env.Auth as unknown as AuthService
 		const User = context.locals.runtime.env.User as unknown as UserService
 		
-		const user = validate(await Auth.google(context.request.url));
+		const user = validate(await Auth.fetchUser('google', context.request.url));
 		const token = validate(await User.sign(user)).token;
 
 		const redirect_path = '/chat';

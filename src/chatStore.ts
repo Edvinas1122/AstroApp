@@ -177,6 +177,10 @@ class ChatStore extends PageStore<Chat> {
 				(chat) => ({...chat, ch_member: {...chat.ch_member, role: 'participant'}}))
 		}))
 	}
+
+	async receive(input: Chat) {
+		this.set(this.key, input);
+	}
 }
 
 export const chats = new ChatStore({}, 

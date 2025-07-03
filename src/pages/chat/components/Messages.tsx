@@ -1,104 +1,11 @@
-import styles from './Chat.module.css'
 import { useEffect, useRef } from "preact/hooks";
-import {messages, members, chats, $invite_modal, $createChat_modal, route} from "../../../chatStore";
-import type { Message, Chat, Member } from '../../../chatStore';
+import {messages, members, chats, $invite_modal, $createChat_modal, route} from "@root/src/chatStore";
+import type { Message, Chat, Member } from '@root/src/chatStore';
 import { useStore } from "@nanostores/preact";
 
 type ChatReq = {
 	email: string,
 };
-
-
-import type { VNode } from 'preact';
-
-interface ListBoxProps {
-    header?: VNode | string;
-    children?: VNode | VNode[];
-    footer?: VNode;
-    class?: string;
-	width?: string
-}
-
-const ListBox = ({ header, children, footer, class: className = '', width }: ListBoxProps) => (
-    <div class={`${styles.msger} ${className}`} 
-		style={{
-			maxWidth: width
-		}}
-	>
-        {header && (
-            <header class={styles.msgerHeader}>
-                {typeof header === 'string' ? (
-                    <div class={styles.msgerHeaderTitle}>
-                        {header}
-                    </div>
-                ) : (
-                    header
-                )}
-            </header>
-        )}
-        <main class={styles.msgerChat}>
-            {children}
-        </main>
-        {footer && (
-            <footer class={styles.msgerInputArea}>
-                {footer}
-            </footer>
-        )}
-    </div>
-);
-
-interface CenterProps {
-	children: VNode
-}
-
-const Center = ({children}: CenterProps) => (
-	<div style="display: flex; justify-content: center; align-items: center; height: 200px;">
-		{children}
-	</div>
-);
-
-const MemberC = ({ item, children }: { item: Member, children?: React.ReactNode }) => (
-  <div style={{
-    display: 'flex',
-    alignItems: 'center',
-    gap: '10px',
-    padding: '5px 0'
-  }}>
-    {/* Avatar with online status */}
-    <div style={{ position: 'relative' }}>
-      <img
-        src={item.user.picture}
-        alt={item.user.given_name}
-        style={{
-          height: '30px',
-          width: '30px',
-          borderRadius: '100%',
-          objectFit: 'cover'
-        }}
-      />
-      {/* Online Indicator Dot */}
-      <span style={{
-        position: 'absolute',
-        bottom: 0,
-        right: 0,
-        width: '8px',
-        height: '8px',
-        borderRadius: '50%',
-        backgroundColor: item.online ? 'limegreen' : 'gray',
-        border: '1px solid white'
-      }} />
-    </div>
-
-    {/* Name and optional children */}
-    <div>
-      <div>{item.user.given_name}</div>
-      {children}
-    </div>
-  </div>
-);
-
-
-import { createButtonEvent, createFormAction } from '../../../ui/utils';
 
 function isPermitableChat(id: string) {
 	const _chats = useStore(chats.$store)['default'] || [];
@@ -122,6 +29,10 @@ function useLiveChat() {
 	return {_members, _messages, id, permited}
 }
 
+import { createButtonEvent, createFormAction } from '@root/src/script/Form';
+import { Center } from '@ui/Material';
+import { ListBox, ChatUserMini, MessageBox, WritingArea } from '@ui/Chat';
+
 export function ChatDisplay({email}: ChatReq) {
 	const {_members, _messages, id, permited} = useLiveChat();
 	const chatEndRef = useRef<HTMLDivElement>(null);
@@ -144,7 +55,7 @@ export function ChatDisplay({email}: ChatReq) {
 			console.log("member not found", message.member)
 			return null;
 		}
-		return <Message 
+		return <MessageBox 
 			picture={member.picture}
 			sent={message.sent!}
 			content={message.content}
@@ -165,9 +76,11 @@ export function ChatDisplay({email}: ChatReq) {
 
 	const my_role = _members.find((memb) => memb.user.email === email)?.ch_member.role
 
-	const renderAdmin = (item: Member) => (
-		<MemberC item={item}/>
-	);
+	const renderAdmin = (item: Member) => <ChatUserMini 
+			picture={{url: item.user.picture, alt: `profile-icon-${item.user.given_name}`}}
+			name={item.user.given_name}
+			online={item.online}
+	/>;
 
 	const ChatPort = (
 		<>
@@ -175,21 +88,16 @@ export function ChatDisplay({email}: ChatReq) {
 			width='1000px'
 			header={<><i class="fas fa-comment-alt"></i>{`${_name} - chat`}</>}
 			footer={
-				<form className={styles.msgerInputarea} onSubmit={submit}>
-					<textarea name="content" placeholder="Enter your message..." 
-						className={styles.msgerInput}
-						onKeyDown={submit.stroke}
-					/>
-					<button
-						className={styles.msgerSendBtn}
-					>Send</button>
-				</form>
-				}
+				<WritingArea
+					onStroke={(e) => submit.stroke(e)}
+					onSubmit={(e) => submit(e)}
+				/>
+			}
 			>
-				{!!_messages.length ? <main className={styles.msgerChat}>
+				{!!_messages.length ? <>
 					{_messages.map(renderMessage)}
 					<div ref={chatEndRef}/>
-				</main> : (<Center><p>{`🧙 Epic ${_name} chat starts with a message ✉️`}</p></Center>)}
+				</> : (<Center><p>{`🧙 Epic ${_name} chat starts with a message ✉️`}</p></Center>)}
 		</ListBox>
 		<ListBox
 			width='200px'
@@ -228,38 +136,13 @@ export function ChatDisplay({email}: ChatReq) {
 }
 
 
-type MessageProps = {
-	name: string,
-	picture: string,
-	sent: string,
-	content: string,
-	my: boolean
-}
-
-const Message = ({ name, picture, sent, content, my }: MessageProps) => (
-	<div className={`${styles.msg} ${my ? styles.rightMsg : styles.leftMsg}`}>
-		<img
-			class={styles.msgImg}
-			src={picture}
-			alt={name}
-		/>
-		<div className={styles.msgBubble}>
-			<div class={styles.msgInfo}>
-				<div class={styles.msgInfoName}>{name}</div>
-				<div class={styles.msgInfoTime}>{sent}</div>
-			</div>
-			<div class={styles.msgText}>{content}</div>
-		</div>
-	</div>
-);
-
 interface ChatListProps {
 	email: string
 }
 
 function ChatList({email}: ChatListProps) {
 	const _chats = useStore(chats.$store)['default'] || [];
-	const chatEndRef = useRef<HTMLDivElement>(null);
+	// const chatEndRef = useRef<HTMLDivElement>(null);
 	const currentSelect = useStore(route)[1];
 	
 	useEffect(() => {
@@ -334,7 +217,7 @@ function ChatList({email}: ChatListProps) {
 				footer={
 					<button onClick={() => $createChat_modal.set(true)}>Create Chat</button>
 				}>
-				<main className={styles.msgerChat}>
+				<>
 					{!!invited.length && <section>
 						<p>{`Invited (${invited.length})`}</p>
 						{invited.map(renderInvitedChats)}
@@ -347,8 +230,8 @@ function ChatList({email}: ChatListProps) {
 						<p>{`Participants (${participantChats.length})`}</p>
 						{participantChats.map(renderMyChat)}
 					</section>}
-					<div ref={chatEndRef}/>
-				</main>
+					{/* <div ref={chatEndRef}/> */}
+				</>
 			</ListBox>
 		</>
 	);

@@ -2,9 +2,9 @@ import { useEffect, useRef, useState } from "preact/hooks"
 import {
 	onConnect,
 	onMessage
-} from '../../handlers'
+} from '../handlers'
 import { useStore } from "@nanostores/preact";
-import { $socket } from "../../chatStore"
+import { $socket } from "../chatStore"
 
 export function Socket({
 	children,

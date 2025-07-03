@@ -1,6 +1,7 @@
 import { h } from 'preact';
 import style from './Material.module.css';
 import { useRef, useEffect } from 'preact/hooks';
+import type { VNode } from 'preact';
 
 interface CardProps {
     header?: preact.ComponentChildren;
@@ -88,3 +89,13 @@ export function Modal({
 	</>	
 	);
 }
+
+interface CenterProps {
+	children: VNode
+}
+
+export const Center = ({children}: CenterProps) => (
+	<div style="display: flex; justify-content: center; align-items: center; height: 200px;">
+		{children}
+	</div>
+);

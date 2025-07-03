@@ -3,7 +3,7 @@ import { $invite_modal, members, route } from "../../../chatStore";
 import { Modal} from "../../../ui/Material";
 import { useEffect, useState, useRef } from "preact/hooks";
 import { actions } from "astro:actions";
-import { createFormAction } from "../../../ui/utils";
+import { createFormAction } from "../../../script/Form";
 import {
 	$createChat_modal,
 	chats

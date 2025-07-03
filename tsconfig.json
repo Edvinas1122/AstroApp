@@ -8,11 +8,13 @@
     "dist"
   ],
   "compilerOptions": {
-    // "baseUrl": ".",
+    // https://docs.astro.build/en/guides/imports/#aliases
+    "baseUrl": ".",
     "paths": {
       "@api/*": ["../api/src/*"],
-      "@root/*": ["./src/*"],
-      "@ui/*": ["./src/ui/*"],
+      "@root/*": ["*"],
+      "@ui/*": ["src/ui/*"],
+      "@script/*": ["src/script/*"]
     },
     "types": [
       "./worker-configuration.d.ts",

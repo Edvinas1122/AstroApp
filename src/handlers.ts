@@ -17,13 +17,8 @@ handlers.set('chat', (ws, m: Message['content']) => {
 })
 
 handlers.set('invite', (ws, m: Invite['content']) => {
-	// chats.receive(m.)
-	// alert(`invited into a chat - ${m.chat}, by ${m.by}`);
-	// chats.fetch('default');
 	chats.receive({ch_member: m.ch_member, chat: m.chat})
 })
-
-// import { AtomWebSocket } from "./utils/socket";
 
 export const onMessage = (ws: WebSocket) => (message: MessageEvent) => {
 

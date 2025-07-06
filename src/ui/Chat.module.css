@@ -92,6 +92,10 @@
   font-size: 0.85em;
 }
 
+.msgText {
+	overflow-wrap: anywhere;
+}
+
 .leftMsg .msgBubble {
   border-bottom-left-radius: 0;
 }

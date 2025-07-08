@@ -1,5 +1,5 @@
 import { useEffect } from "preact/hooks"
-import {route} from "../chatStore"
+import {route} from "./stores"
 
 interface VirtualRouterProps {
 	children: ChildNode

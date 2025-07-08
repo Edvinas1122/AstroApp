@@ -1,13 +1,12 @@
 import { defineAction } from "astro:actions";
 import { z } from 'astro:schema';
-import type { UserService, SocketUtilsService } from '../../../api/src';
 import { createServiceActionBuilder } from "./utils";
 
-const userAction = createServiceActionBuilder<UserService>(
+const userAction = createServiceActionBuilder(
 	(context) => context.locals.runtime.env.User
 )
 
-const socketAction = createServiceActionBuilder<SocketUtilsService>(
+const socketAction = createServiceActionBuilder(
 	(c) => c.locals.runtime.env.WebSocket
 )
 
@@ -20,5 +19,5 @@ export const user = {
 	),
 	online: socketAction(z.object({}),
 		async (_, {service}) => await service.onlineCount()
-	)
+	),
 }

@@ -1,8 +1,7 @@
 import { z, type ZodTypeAny, ZodObject, ZodString } from 'astro:schema';
-import type { ChatService } from '../../../api/src';
 import { createServiceActionBuilder } from "./utils";
 
-const chatAction = createServiceActionBuilder<ChatService>(
+const chatAction = createServiceActionBuilder(
 	(context) => context.locals.runtime.env.Chat
 )
 
@@ -35,9 +34,9 @@ export const chat = {
 	messages: chatAction(paginate, async (input, {service, email}) => {
 		return await service.messages(email, input.id);
 	}),
-	send: chatAction(one({content: z.string()}),
+	send: chatAction(one({content: z.string(), file_key: z.string().optional()}),
 		async (input, {service, email}) => {
-			return await service.send(email, input.id, input.content);
+			return await service.send(email, input.id, input.content, input.file_key);
 	}),
 	members: chatAction(paginate, async (input, {service, email}) => {
 			return await service.members(email, input.id);

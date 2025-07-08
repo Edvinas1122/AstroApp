@@ -1,6 +1,8 @@
 import type { FormEvent } from "preact/compat";
 import styles from "./Chat.module.css"
 import type { VNode } from "preact";
+import { useState } from "preact/hooks";
+
 
 interface ListBoxProps {
 	header?: VNode | string;
@@ -94,10 +96,27 @@ type MessageProps = {
 	picture: string,
 	sent: string,
 	content: string,
-	my: boolean
+	my: boolean,
+	file?: {type: "image" | "video", url: string} | null
 }
 
-export const MessageBox = ({ name, picture, sent, content, my }: MessageProps) => (
+const _file = {
+	image: (url: string) => <img src={url} alt="Selected file preview" className={styles.previewImage} />,
+	video: (url: string) => <video src={url} controls className={styles.previewImage} />,
+};
+
+function pickType(type: keyof typeof _file) {
+	if (type.startsWith("image")) {
+		return _file.image
+	} else if (type.startsWith("video")) {
+		return _file.video
+	} else {
+		console.error("unknown type", type);
+		return () => (<>error type</>)
+	}
+}
+
+export const MessageBox = ({ name, picture, sent, content, my, file }: MessageProps) => (
 	<div className={`${styles.msg} ${my ? styles.rightMsg : styles.leftMsg}`}>
 		<img
 			class={styles.msgImg}
@@ -109,6 +128,7 @@ export const MessageBox = ({ name, picture, sent, content, my }: MessageProps) =
 				<div class={styles.msgInfoName}>{name}</div>
 				<div class={styles.msgInfoTime}>{sent}</div>
 			</div>
+			{file && pickType(file.type)(file.url)}
 			<div class={styles.msgText}>{content}</div>
 		</div>
 	</div>
@@ -116,19 +136,84 @@ export const MessageBox = ({ name, picture, sent, content, my }: MessageProps) =
 
 type WritingAreaProps = {
 	onSubmit: (e: FormEvent) => void,
-	onStroke: (e: KeyboardEvent) => void
+	submit: (form: HTMLFormElement) => void,
 }
 
 export const WritingArea = ({
-	onSubmit, onStroke
-}: WritingAreaProps) => (
-	<form className={styles.msgerInputarea} onSubmit={onSubmit}>
-		<textarea name="content" placeholder="Enter your message..." 
-			className={styles.msgerInput}
-			onKeyDown={onStroke}
-		/>
-		<button
-			className={styles.msgerSendBtn}
-		>Send</button>
-	</form>
-)
+	submit,
+	onSubmit,
+}: WritingAreaProps) => {
+
+	const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+	const adjustHeight = (e: Event) => {
+		const textarea = e.target as HTMLTextAreaElement;
+		textarea.style.height = 'auto';
+		textarea.style.height = `${Math.min(textarea.scrollHeight, 120)}px`;
+	};
+
+	const onFileChange = (event: Event) => {
+		const input = event.target as HTMLInputElement;
+		const file = input.files ? input.files[0] : null;
+		
+		if (file && file.type.startsWith('image/')) {
+			const url = URL.createObjectURL(file);
+			setPreviewUrl(url);
+		} else {
+			clearPreview();
+		}
+	};
+
+	const clearPreview = () => {
+		if (previewUrl) {
+			URL.revokeObjectURL(previewUrl);
+			setPreviewUrl(null);
+		}
+	};
+
+	const renderPreview = (url: string) => (
+        <div className={styles.previewContainer}>
+          <img src={url} alt="Selected file preview" className={styles.previewImage} />
+          <button
+            type="button"
+            className={styles.clearPreviewBtn}
+            onClick={clearPreview}
+            title="Remove image"
+          >
+            ×
+          </button>
+        </div>
+	)
+
+	const onStroke = (e: KeyboardEvent) => {
+		if (e.key === 'Enter' && !e.shiftKey) {
+			e.preventDefault();
+			const form = (e.target as HTMLTextAreaElement).form;
+			submit(form as HTMLFormElement);
+		}
+	};
+
+	return (
+		<form className={styles.msgerInputarea} onSubmit={onSubmit} onReset={clearPreview}>
+			<label className={styles.fileButton}>
+				{previewUrl && renderPreview(previewUrl)}
+				<span className={styles.fileIcon}>📎</span>
+				<input
+					type="file"
+					name="attachment"
+					accept="image/*,application/pdf"
+					className={styles.fileInput}
+					onChange={onFileChange}
+				/>
+			</label>
+			<textarea name="content" placeholder="Enter your message..." 
+				className={styles.msgerInput}
+				onKeyDown={onStroke}
+				onInput={adjustHeight}
+			/>
+			<button
+				className={styles.msgerSendBtn}
+			>Send</button>
+		</form>
+	)
+}

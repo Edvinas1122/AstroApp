@@ -1,4 +1,4 @@
-import { MessageSchema, type Message, type Invite } from "./ws.schema";
+import { MessageSchema, type Message, type Invite } from "./socket.schema";
 
 type Handler = (ws: WebSocket, message: any) => any
 
@@ -9,7 +9,7 @@ handlers.set('system', (ws, m) => {
 });
 
 
-import { messages, members, chats } from "./chatStore";
+import { messages, chats } from "./stores";
 
 handlers.set('chat', (ws, m: Message['content']) => {
 	messages.receive(m);

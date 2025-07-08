@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "preact/hooks";
-import {messages, members, chats, $invite_modal, $createChat_modal, route} from "@root/src/chatStore";
-import type { Message, Chat, Member } from '@root/src/chatStore';
+import {messages, members, chats, $invite_modal, $createChat_modal, route} from "@script/stores";
+import type { Message, Chat, Member } from '@script/stores';
 import { useStore } from "@nanostores/preact";
 
 type ChatReq = {
@@ -55,17 +55,23 @@ export function ChatDisplay({email}: ChatReq) {
 			console.log("member not found", message.member)
 			return null;
 		}
+		console.log('rendering message', message);
 		return <MessageBox 
 			picture={member.picture}
 			sent={message.sent!}
 			content={message.content}
 			name={member.name}
 			my={member.email === email}
+			file={message.file}
 		/>;
 	}
 
-	const submit = createFormAction(['content'], ({content}, reset) => {
-		messages.send({id, content}, email); reset();
+	const submit = createFormAction([
+		'content',
+		{type: 'file', name: 'attachment'}
+	], ({content, attachment}, reset) => {
+		const file = attachment.size ? attachment : null;
+		messages.send({id, content, file}, email); reset();
 	})
 
 	const _name = id && id.split(':').filter(a => a.length)[0]
@@ -89,8 +95,8 @@ export function ChatDisplay({email}: ChatReq) {
 			header={<><i class="fas fa-comment-alt"></i>{`${_name} - chat`}</>}
 			footer={
 				<WritingArea
-					onStroke={(e) => submit.stroke(e)}
 					onSubmit={(e) => submit(e)}
+					submit={(form) => submit.form(form)}
 				/>
 			}
 			>
@@ -169,7 +175,7 @@ function ChatList({email}: ChatListProps) {
 				onClick={link}
 			>
 				<p>
-					<div>{item.chat.name}</div>
+					<>{item.chat.name}</>
 				</p>
 				{interact(id)}
 			</div>

@@ -19,6 +19,7 @@
 		{ "binding": "Auth", "service": "api", "entrypoint": "Auth" },
 		{ "binding": "Chat", "service": "api", "entrypoint": "Chat" },
 		{ "binding": "WebSocket", "service": "api", "entrypoint": "SocketUtils" },
+		{ "binding": "Upload", "service": "api", "entrypoint": "Upload"}
 	],
 	"vars": {
 		"DEV": false

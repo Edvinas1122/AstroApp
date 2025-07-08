@@ -112,33 +112,143 @@
   margin: 0 0 0 10px;
 }
 
-
 .msgerInputarea {
   display: flex;
-  padding: 10px;
-  border-top: var(--border);
-  background: #eee;
+  align-items: center;
+  padding: 12px;
+  background: #ffffff;
+  border-top: 1px solid #e0e0e0;
+  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
+  border-radius: 12px;
+  margin: 8px;
+  gap: 8px;
 }
-.msgerInputarea * {
-  padding: 10px;
-  border: none;
-  border-radius: 3px;
-  font-size: 1em;
-}
+
 .msgerInput {
   flex: 1;
-  background: #ddd;
+  padding: 10px 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background: #f5f5f5;
+  font-size: 1rem;
+  line-height: 1.5;
+  resize: none; /* Prevent manual resizing */
+  overflow-y: auto;
+  max-height: 120px; /* Max height for textarea */
+  transition: border-color 0.2s ease;
 }
+
+.msgerInput:focus {
+  outline: none;
+  border-color: #007bff;
+  background: #ffffff;
+}
+
 .msgerSendBtn {
-  margin-left: 10px;
-  background: rgb(0, 196, 65);
-  color: #fff;
+  padding: 10px 16px;
+  background: #007bff;
+  color: #ffffff;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.msgerSendBtn:hover {
+  background: #0056b3;
+  transform: translateY(-1px);
+}
+
+.msgerSendBtn:active {
+  transform: translateY(0);
+}
+
+.fileButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: #f5f5f5;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.fileButton:hover {
+  background: #e0e0e0;
+}
+
+.fileIcon {
+  font-size: 1.2rem;
+}
+
+.fileInput {
+  display: none; /* Hide the default file input */
+}
+
+.previewContainer {
+  position: relative;
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 8px;
+  max-width: 100%;
+}
+
+.previewImage {
+  max-width: 120px;
+  max-height: 120px;
+  object-fit: contain;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+
+.clearPreviewBtn {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 24px;
+  height: 24px;
+  background: #ff4d4f;
+  color: #ffffff;
+  border: none;
+  border-radius: 50%;
+  font-size: 1rem;
   font-weight: bold;
   cursor: pointer;
-  transition: background 0.23s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease;
 }
-.msgerSendBtn:hover {
-  background: rgb(0, 180, 50);
+
+.clearPreviewBtn:hover {
+  background: #d9363e;
+}
+
+
+/* Ensure the form is responsive */
+@media (max-width: 600px) {
+  .msgerInputarea {
+    padding: 8px;
+    margin: 4px;
+  }
+
+  .msgerInput {
+    font-size: 0.9rem;
+  }
+
+  .msgerSendBtn {
+    padding: 8px 12px;
+    font-size: 0.9rem;
+  }
+
+  .fileButton {
+    width: 36px;
+    height: 36px;
+  }
 }
 
 /* styles from https://codepen.io/sajadhsm/pen/odaBdd */

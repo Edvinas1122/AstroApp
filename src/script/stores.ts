@@ -4,7 +4,11 @@ export type Message = {
 	member: string;
 	content: string;
 	sent: string;
+	// image: string | null;
+	file?: file | null;
 }
+
+type file = {type: "image" | "video", url: string};
 
 export type Member = {
 	online: boolean | undefined,
@@ -108,34 +112,92 @@ const set_rand_id = () => Date.now().toString(36) + Math.random().toString(36).s
 
 
 class MessageStore extends PageStore<Message & {}> {
-	send(input: Parameters<typeof actions.chat.send>[0], me: string) {
+	private file_resource_link = "https://pub-55793912e84f48a381166c13aae1eca8.r2.dev";
 
+	send(
+		input: Parameters<typeof actions.chat.send>[0] & { file?: File | null },
+		me: string
+	) {
 		const me_member = members.me(input.id, me);
 		const rand_id = 'awaiting-' + set_rand_id()
-
-		this.set(input.id, {
-			id: rand_id,
-			chat: input.id,
-			member: me_member.ch_member.id,
-			// sent: formatDate(new Date()),
-			sent: 'sending...',
-			content: input.content
-		})
 
 		const update = (method: (data: Message) => Message) => this.update(input.id,
 			(m) => m.id === rand_id,
 			method
 		)
 
-		const timeout = setTimeout(() => {
-			console.log('send timmed out');
-			update((message) => ({...message, sent: 'timmed out'}))
-		}, 10000);
+		const sendAction = (file_key?: string) => {
+			const timeout = setTimeout(() => {
+				console.log('send timmed out');
+				update((message) => ({...message, sent: 'timmed out'}))
+			}, 10000);
+			
+			actions.chat.send({...input, file_key})
+				.then(onSuccess((data: Message) => update(() => data)))
+				.catch((reason) => update((data) => ({...data, sent: 'failed'})))
+				.finally(() => clearTimeout(timeout))
+		}
+
+		this.set(input.id, {
+			id: rand_id,
+			chat: input.id,
+			member: me_member.ch_member.id,
+			sent: 'sending...',
+			content: input.content,
+			file: input.file ? {
+				type: input.file.type.startsWith('image/') ? 'image' : 'video',
+				url: URL.createObjectURL(input.file)
+			} : null,
+		})
+
 		
-		actions.chat.send(input)
-			.then(onSuccess((data: Message) => update(() => data)))
-			.catch((reason) => update((data) => ({...data, sent: 'failed'})))
-			.finally(() => clearTimeout(timeout))
+		if (input.file) {
+			console.log('message file', input.file);
+			actions.upload.link({
+					name: input.file.name,
+					type: input.file.type,
+					size: input.file.size,
+					chat: input.id
+			}).then(onSuccess((data: {url: string, file_link: string, key: string}) => {
+				console.log('upload link received', data);
+				fetch(data.url, {
+					method: 'PUT',
+					headers: {
+						'Content-Type': input.file!.type,
+					},
+					body: input.file
+				}).then((response) => {
+					if (response.ok) {
+						console.log('File uploaded successfully');
+						update((message) => ({
+							...message,
+							sent: 'file_ok',
+							file: {
+								type: input.file!.type.startsWith('image/') ? 'image' : 'video',
+								url: data.file_link
+							}
+						}));
+						sendAction(data.key);
+					} else {
+						console.error('File upload failed', response.statusText);
+						update((message) => ({...message, sent: 'failed'}));
+					}
+				}).catch((error) => {
+					console.error('File upload error', error);
+					update((message) => ({...message, sent: 'failed'}));
+				});
+			}))
+		} else {
+			const timeout = setTimeout(() => {
+				console.log('send timmed out');
+				update((message) => ({...message, sent: 'timmed out'}))
+			}, 10000);
+			
+			actions.chat.send({...input})
+				.then(onSuccess((data: Message) => update(() => data)))
+				.catch((reason) => update((data) => ({...data, sent: 'failed'})))
+				.finally(() => clearTimeout(timeout))
+		}
 	}
 	
 	receive(message: Message) {
@@ -157,6 +219,7 @@ export const $createChat_modal = atom<boolean>(false);
 class ChatStore extends PageStore<Chat> {
 
 	public key = 'default'
+
 
 	async create(input: Parameters<typeof actions.chat.create>[0]) {
 		return actions.chat.create(input)

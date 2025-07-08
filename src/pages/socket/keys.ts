@@ -1,5 +1,5 @@
 import type { APIRoute } from "astro";
-import { withError } from "../../utils/error";
+import { withError } from "../../server/error";
 import type { SocketUtilsService } from "../../../../api/src";
 
 

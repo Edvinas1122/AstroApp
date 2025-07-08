@@ -1,6 +1,6 @@
 import type { APIRoute } from "astro";
 import type { AuthService, UserService } from "../../../../api/src";
-import { withError } from "../../utils/error";
+import { withError } from "../../server/error";
 
 export const prerender = false;
 

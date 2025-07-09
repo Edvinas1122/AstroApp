@@ -1,45 +1,12 @@
 ---
 import {generateGoogleOAuthURL} from "../server/oAuth";
+import AppLayout from "./AppLayout.astro";
 
 const developement = Astro.locals.runtime.env.DEV === 'true'
 
-const fetch_urls = {
-	dev: {
-		auth_redirect: "https://dev.edvinas.online/auth/callback",
-		socket_server: "wss://socket.edvinas.online",
-	},
-	prod: {
-		auth_redirect: "https://journal.edvinas.online/auth/callback",
-		socket_server: 'wss://socket.edvinasmomkus.workers.dev'
-	}
-}
 
-const urls = fetch_urls[developement? "dev" : "prod"];
-
-const google_link = generateGoogleOAuthURL({
-	clientId: "921552139948-6kg6f73mdn1dlmp4pn278e19j28cfkb4.apps.googleusercontent.com",
-	redirectUri: urls.auth_redirect
-});
-
-import AppLayout from './AppLayout.astro';
-import { Card } from "../ui/Material";
-import GoogleSignInButton from "../ui/GoogleSignIn"
 ---
 
 <AppLayout>
-	<Card>
-		<slot slot="header">
-			<h1>Splash</h1>
-			<p>live chat application, built on <a href="https://workers.cloudflare.com/">Cloudflare's workers<a> and <a href="https://astro.build/">Astro</a> framework. Sign in to see the splash in action.</p>
-			<p>
-				{developement ? "developement" : "production"} version
-			</p>
-		</slot>
-		<GoogleSignInButton
-			href={google_link}
-		/>
-		<slot slot="footer">
-			<a href="terms">Privacy Terms</a>
-		</slot>
-	</Card>
+<div></div>
 </AppLayout>

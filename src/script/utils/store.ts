@@ -1,6 +1,6 @@
 import { map, type MapStore } from 'nanostores';
 
-class Pages {
+class Pages { // non reactive conditional storage
 	private fetched = new Map<string, {page: number}>()
 
 	public with(key: string, handler: () => Promise<void>) {

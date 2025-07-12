@@ -234,3 +234,4 @@ export const chats = new ChatStore({},
 );
 
 export const route = atom<string[]>([]);
+export const my_email = atom<string | null>(null);

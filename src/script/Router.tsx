@@ -55,10 +55,26 @@ function withFetchRedirect() {
 	}, [])
 }
 
+import { my_email } from "./stores";
+
+function withSelfID() {
+	useEffect(() => {
+		if (!my_email.get()) {
+			const email = document.cookie
+				.split(";")
+				.find((row) => row.startsWith("email="))
+				?.split("=")[1];
+			if (!email) {window.location.href = '/auth'; return ;}
+			my_email.set(decodeURIComponent(email));
+		}
+	}, []);
+}
+
 function VirtualRouter({ children }: VirtualRouterProps) {
 
 	withRouter();
 	withFetchRedirect();
+	withSelfID();
 
 	return <>{children}</>;
 }

@@ -18,17 +18,10 @@ const fetch_urls = {
 
 const developement = Astro.locals.runtime.env.DEV === 'true'
 
-
-export const prerender = false;
-
-const {slug} = Astro.params;
-
-const user_email = Astro.locals.user.email;
-if (!user_email) return Astro.redirect('/auth');
+export const prerender = true;
 
 const urls = fetch_urls[developement? "dev" : "prod"];
 
-console.log("chat:",slug)
 
 ---
 <AppLayout>
@@ -53,7 +46,6 @@ console.log("chat:",slug)
 					client:load
 				/>
 				<ChatDisplay
-					email={user_email}
 					client:load
 				/>
 			<div>

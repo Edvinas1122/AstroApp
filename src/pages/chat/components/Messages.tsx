@@ -1,11 +1,7 @@
 import { useEffect, useRef } from "preact/hooks";
-import {messages, members, chats, $invite_modal, $createChat_modal, route} from "@script/stores";
+import {messages, members, chats, $invite_modal, $createChat_modal, route, my_email} from "@script/stores";
 import type { Message, Chat, Member } from '@script/stores';
 import { useStore } from "@nanostores/preact";
-
-type ChatReq = {
-	email: string,
-};
 
 function isPermitableChat(id: string) {
 	const _chats = useStore(chats.$store)['default'] || [];
@@ -18,6 +14,7 @@ function useLiveChat() {
 	const permited = isPermitableChat(id);
 	const _members = useStore(members.$store)[id] || []
 	const _messages = useStore(messages.$store)[id] || [];
+	const _my_email = useStore(my_email);
 
 	useEffect(() => {
 		if (id && permited) {
@@ -26,7 +23,7 @@ function useLiveChat() {
 		}
 	}, [id, permited]);
 
-	return {_members, _messages, id, permited}
+	return {_members, _messages, id, permited, email: _my_email}
 }
 
 import { createButtonEvent, createFormAction } from '@root/src/script/Form';
@@ -34,20 +31,86 @@ import { Center } from '@ui/Material';
 import { ListBox, ChatUserMini, MessageBox, WritingArea } from '@ui/Chat';
 import type { VNode } from "preact";
 
-export function ChatDisplay({email}: ChatReq) {
-	const {_members, _messages, id, permited} = useLiveChat();
+export function ChatDisplay() {
+	const {
+		_members,
+		_messages,
+		id, permited, email
+	} = useLiveChat();
+
+	if (!email) return <Center><p>loading...</p></Center>
+
+	const submit = createFormAction([
+		'content',
+		{type: 'file', name: 'attachment'}
+	], ({content, attachment}, reset) => {
+		const file = attachment.size ? attachment : null;
+		messages.send({id, content, file}, email); reset();
+	})
+
+	const ChatPort = (
+		<>
+		<MessagesView
+			members={_members}
+			messages={_messages}
+			id={id}
+			email={email}
+			typer={
+				<WritingArea
+					onSubmit={(e) => submit(e)}
+					submit={(form) => submit.form(form)}
+				/>
+			}
+		/>
+		<MembersView
+			members={_members}
+			invite={<>
+				<button onClick={() => $invite_modal.set(true)}>Invite users</button>
+			</>}
+		/>
+		</>
+	)
+
+	return (
+		<>
+			<ChatList
+				email={email}
+			/>
+			{id ? !permited ? (<Center><p>404 Not Found</p></Center>) : ChatPort : (<Center><p>Start chat by selecting or creating one</p></Center>)
+			}
+		</>
+	);
+}
+
+interface MessagesViewReq {
+	messages: Message[],
+	members: Member[],
+	email: string,
+	id: string,
+	typer: VNode
+}
+
+function MessagesView({
+	members,
+	messages,
+	email,
+	id,
+	typer
+}: MessagesViewReq) {
+
 	const chatEndRef = useRef<HTMLDivElement>(null);
+
 
 	useEffect(() => {
 		scrollToBottom();
-	}, [_messages]);
+	}, [messages]);
 
 	const scrollToBottom = () => {
         chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
     };
 
 	function selectMember(id: string) {
-		return _members.find((item) => item.ch_member.id === id)?.user;
+		return members.find((item) => item.ch_member.id === id)?.user;
 	}
 
 	function renderMessage(message: Message) {
@@ -67,79 +130,64 @@ export function ChatDisplay({email}: ChatReq) {
 		/>;
 	}
 
-	const submit = createFormAction([
-		'content',
-		{type: 'file', name: 'attachment'}
-	], ({content, attachment}, reset) => {
-		const file = attachment.size ? attachment : null;
-		messages.send({id, content, file}, email); reset();
-	})
-
 	const _name = id && id.split(':').filter(a => a.length)[0]
 
-	const admins = _members.filter(memb => memb.ch_member.role === 'admin');
-	const participants = _members.filter(memb => memb.ch_member.role === 'participant');
-	const invited = _members.filter(memb => memb.ch_member.role === 'invited');
+	return (
+		<ListBox
+			width='1000px'
+			header={<><i class="fas fa-comment-alt"></i>{`${_name} - chat`}</>}
+			footer={typer}
+			>
+				{!!messages.length ? <>
+					{messages.map(renderMessage)}
+					<div ref={chatEndRef}/>
+				</> : (<Center><p>{`🧙 Epic ${_name} chat starts with a message ✉️`}</p></Center>)}
+		</ListBox>
+	)
+}
 
-	const my_role = _members.find((memb) => memb.user.email === email)?.ch_member.role
+interface MembersViewReq {
+	members: Member[],
+	invite: VNode
+}
 
-	const renderAdmin = (item: Member) => <ChatUserMini 
+function MembersView({
+	members,
+	invite
+}: MembersViewReq) {
+
+	const admins = members.filter(memb => memb.ch_member.role === 'admin');
+	const participants = members.filter(memb => memb.ch_member.role === 'participant');
+	const invited = members.filter(memb => memb.ch_member.role === 'invited');
+
+	const renderMember = (item: Member) => <ChatUserMini 
 			picture={{url: item.user.picture, alt: `profile-icon-${item.user.given_name}`}}
 			name={item.user.given_name}
 			online={item.online}
 	/>;
 
-	const ChatPort = (
-		<>
-		<ListBox
-			width='1000px'
-			header={<><i class="fas fa-comment-alt"></i>{`${_name} - chat`}</>}
-			footer={
-				<WritingArea
-					onSubmit={(e) => submit(e)}
-					submit={(form) => submit.form(form)}
-				/>
-			}
-			>
-				{!!_messages.length ? <>
-					{_messages.map(renderMessage)}
-					<div ref={chatEndRef}/>
-				</> : (<Center><p>{`🧙 Epic ${_name} chat starts with a message ✉️`}</p></Center>)}
-		</ListBox>
+	return (
 		<ListBox
 			width='200px'
 			header={<>Members</>}
-			footer={
-				<>
-					<button onClick={() => $invite_modal.set(true)}>Invite users</button>
-				</>
-			}
+			footer={invite}
 		>
-			{_members.length > 1 ? <><section>
+			{members.length > 1 ? <><section>
 				<p>Admin</p>
-				{admins.map(renderAdmin)}
-			</section>
-			{!!participants.length && <section>
-				<p>Participants</p>
-				{participants.map(renderAdmin)}
-			</section>}
-			{!!invited.length && <section>
-				<p>Invited</p>
-				{invited.map(renderAdmin)}
-			</section>}</> : (<Center><p>Invite wonderers to chat with them</p></Center>)}
-		</ListBox>
-		</>
-	)
-
-	return (
-		<>
-			<ChatList
-				email={email}
-			/>
-			{id ? !permited ? (<Center><p>404 Not Found</p></Center>) : ChatPort : (<Center><p>Start chat by selecting or creating one</p></Center>)
+					{admins.map(renderMember)}
+				</section>
+				{!!participants.length && <section>
+					<p>Participants</p>
+					{participants.map(renderMember)}
+				</section>}
+				{!!invited.length && <section>
+					<p>Invited</p>
+					{invited.map(renderMember)}
+				</section>}</> 
+				: (<Center><p>Invite wonderers to chat with them</p></Center>)
 			}
-		</>
-	);
+		</ListBox>
+	)
 }
 
 

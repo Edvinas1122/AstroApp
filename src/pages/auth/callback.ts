@@ -31,6 +31,9 @@ export const GET: APIRoute = withError(
 		const redirect_path = '/chat';
 		const respond = new Response("", {status: 302});
 		respond.headers.append('Set-Cookie', cookie(token).join(";"));
+		respond.headers.append('Set-Cookie',
+			`email=${encodeURIComponent(user.email)}; Path=/; SameSite=Lax`
+		);
 		respond.headers.append('Location', `${redirect_path}?authStatus=completed`);
 
 		return respond;

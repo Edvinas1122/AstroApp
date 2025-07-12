@@ -14,7 +14,7 @@ function createServiceActionBuilder<Service>(
 			input: schema,
 			handler: async (input, context) => {
 				const service = getService(context);
-				const email = context.locals.user.email;
+				const email = context.locals.user.email!;
 				try {
 					return await handler(input, { email, service, context });
 				} catch (error: any) {

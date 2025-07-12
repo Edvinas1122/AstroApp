@@ -43,27 +43,10 @@ export type Chat = {
 }
 
 
-import { actions, type SafeResult } from "astro:actions";
+import { actions } from "astro:actions";
 import { PageStore } from "./utils/store";
 import { atom } from "nanostores";
-
-
-function handleResult<T>(result: SafeResult<any, any>) {
-	console.log('before')
-	if (result.error) {
-		console.log('error occured');
-		throw new Error("failed to fetch:", result.error);
-	}
-	console.log('after', result);
-	return result.data as T;
-}
-
-function onSuccess<T, RET>(handler: (data: T) => RET) {
-	return (result: SafeResult<any, any>) => {
-		const data = handleResult(result);
-		return handler(data as T);
-	}
-}
+import { onSuccess, handleResult } from "./utils/result";
 
 class MemberStore extends PageStore<Member> {
 	async invite(input: Parameters<typeof actions.chat.invite>[0]) {

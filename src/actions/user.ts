@@ -1,4 +1,3 @@
-import { defineAction } from "astro:actions";
 import { z } from 'astro:schema';
 import { createServiceActionBuilder } from "./utils";
 
@@ -20,4 +19,7 @@ export const user = {
 	online: socketAction(z.object({}),
 		async (_, {service}) => await service.onlineCount()
 	),
+	socket_key: socketAction(z.object({}),
+		async (_, {email, service}) => await service.key(email)
+	)
 }

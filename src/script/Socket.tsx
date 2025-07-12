@@ -14,7 +14,7 @@ export function Socket({
 	url: string,
 }) {
 	
-	const {socket, connect} = useAuthWebSocket(url, "/socket/keys");
+	const {socket, connect} = useAuthWebSocket(url);
 	const reconnect = useReconnect(connect)
 
 	useEffect(() => {
@@ -85,19 +85,21 @@ function useReconnect(
 	return reconnect;
 }
 
-function useAuthWebSocket(url: string, auth_url: string) {
+import {actions} from "astro:actions";
+import { onSuccess } from "./utils/result";
+
+function useAuthWebSocket(url: string) {
 
 	const socket = useStore($socket)
 
-	const connect = () => fetch(auth_url)
-			.then((response) => response.json() as Promise<{ key: string }>)
-			.then((token) => {
+	const connect = () => actions.user.socket_key({})
+			.then(onSuccess((token: string) => {
 				const address = new URL(url);
 				address.pathname = 'websocket';
-				address.searchParams.set('token', token.key);
+				address.searchParams.set('token', token);
 				console.log('connecting to socket');
 				return new WebSocket(address.href)
-			})
+			}))
 			.then($socket.set)
 			.then(() => true)
 

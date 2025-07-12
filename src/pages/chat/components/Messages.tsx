@@ -32,6 +32,7 @@ function useLiveChat() {
 import { createButtonEvent, createFormAction } from '@root/src/script/Form';
 import { Center } from '@ui/Material';
 import { ListBox, ChatUserMini, MessageBox, WritingArea } from '@ui/Chat';
+import type { VNode } from "preact";
 
 export function ChatDisplay({email}: ChatReq) {
 	const {_members, _messages, id, permited} = useLiveChat();

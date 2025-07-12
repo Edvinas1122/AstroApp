@@ -157,7 +157,7 @@ function ChatList({email}: ChatListProps) {
 
 
 	const renderChat = (interact: (id: string) => VNode) => (item: Chat) => {
-		const id = item.chat.id;
+		const id = item.id;
 		const selected = id === currentSelect;
 		const link = () => window.history.pushState({}, '', `/chat/${id}`);
 		return (
@@ -175,16 +175,16 @@ function ChatList({email}: ChatListProps) {
 				onClick={link}
 			>
 				<p>
-					<>{item.chat.name}</>
+					<>{item.name}</>
 				</p>
 				{interact(id)}
 			</div>
 		)
 	}
 
-	const myChats = _chats.filter(chat => chat.ch_member.role === 'admin');
-	const participantChats = _chats.filter(chat => chat.ch_member.role === 'participant');
-	const invited = _chats.filter(chat => chat.ch_member.role === 'invited');
+	const myChats = _chats.filter(chat => chat.my_role === 'admin');
+	const participantChats = _chats.filter(chat => chat.my_role === 'participant');
+	const invited = _chats.filter(chat => chat.my_role === 'invited');
 
 	const renderMyChat = renderChat((id) =>	{
 		const action = createButtonEvent((e, reset) => {
@@ -213,7 +213,7 @@ function ChatList({email}: ChatListProps) {
 		</button>
 	</div>)
 
-
+	
 
 	return (
 		<>

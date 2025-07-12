@@ -33,22 +33,15 @@ export type Member = {
 }
 
 export type Chat = {
-	chat: {
-        id: string;
-        name: string;
-        public: "public" | "private" | null;
-        description: string | null;
-        created_at: string | null;
-    };
-    ch_member: {
-        id: string;
-        chat: string;
-        user: string;
-        role: "invited" | "blocked" | "participant" | "admin" | null;
-        about: string | null;
-        since: string | null;
-    };
+    my_role: "invited" | "blocked" | "participant" | "admin" | null;
+    id: string;
+    name: string;
+    public: "public" | "private" | null;
+    description: string | null;
+    creator: string | null;
+    created_at: string | null;
 }
+
 
 import { actions, type SafeResult } from "astro:actions";
 import { PageStore } from "./utils/store";
@@ -228,7 +221,7 @@ class ChatStore extends PageStore<Chat> {
 
 	async delete(input: Parameters<typeof actions.chat.delete>[0]) {
 		return actions.chat.delete(input).then((result) => {
-			this.erase(this.key, (item) => item.chat.id !== input.id);
+			this.erase(this.key, (item) => item.id !== input.id);
 			return true;
 		})
 	}
@@ -236,8 +229,8 @@ class ChatStore extends PageStore<Chat> {
 	async accept(input: Parameters<typeof actions.chat.accept>[0]) {
 		return actions.chat.accept(input).then(onSuccess((data: unknown) => {
 			this.update(this.key,
-				(chat) => chat.chat.id === input.id,
-				(chat) => ({...chat, ch_member: {...chat.ch_member, role: 'participant'}}))
+				(chat) => chat.id === input.id,
+				(chat) => ({...chat, my_role: 'participant'}))
 		}))
 	}
 

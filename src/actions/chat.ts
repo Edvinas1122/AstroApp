@@ -48,5 +48,8 @@ export const chat = {
 	accept: chatAction(one({
 	}), async (input, {service, email}) => {
 		return await service.accept(email, input.id)
-	})
+	}),
+	leave: chatAction(one({}), 
+		async (input, {service, email}) => await service.leave(email, input.id)
+	)
 }

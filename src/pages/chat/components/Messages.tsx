@@ -213,7 +213,13 @@ function ChatList({email}: ChatListProps) {
 		</button>
 	</div>)
 
-	
+	const renderParticipantChats = renderChat((id) => <div>
+		<button
+			onClick={() => chats.leave({id})}
+		>
+			Leave
+		</button>
+	</div>)
 
 	return (
 		<>
@@ -234,7 +240,7 @@ function ChatList({email}: ChatListProps) {
 					</section>}
 					{!!participantChats.length && <section>
 						<p>{`Participants (${participantChats.length})`}</p>
-						{participantChats.map(renderMyChat)}
+						{participantChats.map(renderParticipantChats)}
 					</section>}
 					{/* <div ref={chatEndRef}/> */}
 				</>

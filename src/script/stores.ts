@@ -234,6 +234,13 @@ class ChatStore extends PageStore<Chat> {
 		}))
 	}
 
+	async leave(input: Parameters<typeof actions.chat.leave>[0]) {
+		const result = actions.chat.leave(input)
+		this.erase(this.key, 
+			(chat) => chat.id === input.id
+		)
+	}
+
 	async receive(input: Chat) {
 		this.set(this.key, input);
 	}

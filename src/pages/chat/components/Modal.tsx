@@ -1,6 +1,6 @@
 import { useStore } from "@nanostores/preact";
 import { $invite_modal, members, route } from "@script/stores";
-import { Modal} from "@ui/Material";
+import { Modal} from "@root/src/ui/components/Material";
 import { useEffect, useState, useRef } from "preact/hooks";
 import { actions } from "astro:actions";
 import { createFormAction } from "@script/Form";

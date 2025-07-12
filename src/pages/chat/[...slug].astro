@@ -1,9 +1,11 @@
 ---
+import type { GetStaticPaths } from "astro";
 import AppLayout from "@root/src/pages/AppLayout.astro";
 import {ChatDisplay} from "./components/Messages"
 import { CreateChatModal, InviteModal } from "./components/Modal";
 import { Socket } from "@script/Socket";
 import { VirtualRouter } from "@script/Router";
+import ChatList from "./components/Chats";
 
 const fetch_urls = {
 	dev: {
@@ -18,7 +20,7 @@ const fetch_urls = {
 
 const developement = Astro.locals.runtime.env.DEV === 'true'
 
-export const prerender = true;
+export const prerender = false;
 
 const urls = fetch_urls[developement? "dev" : "prod"];
 
@@ -43,6 +45,9 @@ const urls = fetch_urls[developement? "dev" : "prod"];
 					client:load
 				/>
 				<CreateChatModal
+					client:load
+				/>
+				<ChatList
 					client:load
 				/>
 				<ChatDisplay

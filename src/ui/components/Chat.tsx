@@ -91,7 +91,7 @@ export const ChatUserMini = ({
 );
 
 
-type MessageProps = {
+export type MessageProps = {
 	name: string,
 	picture: string,
 	sent: string,

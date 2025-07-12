@@ -10,7 +10,7 @@ type ChatReq = {
 function isPermitableChat(id: string) {
 	const _chats = useStore(chats.$store)['default'] || [];
 
-	return !!_chats.filter(c => c.chat.id === id).length
+	return !!_chats.filter(c => c.id === id).length
 }
 
 function useLiveChat() {

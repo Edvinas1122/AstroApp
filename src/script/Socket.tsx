@@ -88,6 +88,7 @@ function useReconnect(
 import {actions} from "astro:actions";
 import { onSuccess } from "./utils/result";
 
+
 function useAuthWebSocket(url: string) {
 
 	const socket = useStore($socket)
@@ -102,6 +103,7 @@ function useAuthWebSocket(url: string) {
 			}))
 			.then($socket.set)
 			.then(() => true)
+
 
 	useEffect(() => {
 		if (!$socket.get()) {

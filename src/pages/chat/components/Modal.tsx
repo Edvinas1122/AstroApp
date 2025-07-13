@@ -89,10 +89,10 @@ export function CreateChatModal() {
 	const open = useStore($createChat_modal);
 	const focusRef = withFocus(open);
 
-	const submit = createFormAction(['name'], (input, reset) => {
-		chats.create(input).then(chat => {
+	const submit = createFormAction(['name'], ({name}, reset) => {
+		chats.create({name}).then(chat => {
 			$createChat_modal.set(false);
-			window.history.pushState({}, '', `/chat/${chat.chat.id}`)
+			window.history.pushState({}, '', `/chat/${chat.id}`)
 			reset();
 		})
 	});

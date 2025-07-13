@@ -198,12 +198,15 @@ class ChatStore extends PageStore<Chat> {
 
 
 	async create(input: Parameters<typeof actions.chat.create>[0]) {
-		return actions.chat.create(input)
+		const response = await actions.chat.create(input)
 		.then(onSuccess((data: Chat) => this.set(this.key, data)))
+		console.log(response)
+		return response
 	}
 
 	async delete(input: Parameters<typeof actions.chat.delete>[0]) {
 		return actions.chat.delete(input).then((result) => {
+			console.log('erase:', input.id)
 			this.erase(this.key, (item) => item.id !== input.id);
 			return true;
 		})

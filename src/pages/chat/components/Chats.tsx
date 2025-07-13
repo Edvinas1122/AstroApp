@@ -5,6 +5,7 @@ import { useStore } from "@nanostores/preact";
 import { ListBox } from "@ui/components/Chat";
 import type { VNode } from "preact";
 import { createButtonEvent } from "@script/Form";
+import { Center } from "@root/src/ui/components/Material";
 
 export default function ChatList() {
 	const _chats = useStore(chats.$store)['default'] || [];
@@ -45,14 +46,15 @@ export default function ChatList() {
 	const participantChats = _chats.filter(chat => chat.my_role === 'participant');
 	const invited = _chats.filter(chat => chat.my_role === 'invited');
 
-	const renderMyChat = renderChat((id) =>	{
+	const renderMyChat = renderChat((_id) =>	{
 		const action = createButtonEvent((e, reset) => {
 			e.stopPropagation();
-			chats.delete({id}).then(() => {
-				reset();
-				if (currentSelect === id) {
+			chats.delete({id: _id}).then(() => {
+
+				if (currentSelect === _id) {
 					window.history.replaceState({}, '', '/chat')
 				}
+				reset();
 			})
 		})
 		return	<button
@@ -80,16 +82,7 @@ export default function ChatList() {
 		</button>
 	</div>)
 
-	return (
-		<>
-			<ListBox
-				width='200px'
-				header={<>Chats</>}
-				footer={
-					<button onClick={() => $createChat_modal.set(true)}>Create Chat</button>
-				}>
-				<>
-					{!!invited.length && <section>
+	const ListPort = (<>{!!invited.length && <section>
 						<p>{`Invited (${invited.length})`}</p>
 						{invited.map(renderInvitedChats)}
 					</section>}
@@ -100,8 +93,24 @@ export default function ChatList() {
 					{!!participantChats.length && <section>
 						<p>{`Participants (${participantChats.length})`}</p>
 						{participantChats.map(renderParticipantChats)}
-					</section>}
-					{/* <div ref={chatEndRef}/> */}
+					</section>}</>)
+
+	const LoadingView = (
+		<section>
+			<p>Loading</p>
+		</section>
+	)
+
+	return (
+		<>
+			<ListBox
+				width='200px'
+				header={<>Chats</>}
+				footer={
+					<button onClick={() => $createChat_modal.set(true)}>Create Chat</button>
+				}>
+				<>
+					{_chats.loading ? LoadingView : ListPort}
 				</>
 			</ListBox>
 		</>

@@ -1,17 +1,17 @@
 import { useEffect } from "preact/hooks";
-import {messages, members, chats, $invite_modal, $createChat_modal, route, my_email} from "@script/stores";
-import type { Message, Chat, Member } from '@script/stores';
+import {messages, members, chats, $invite_modal, route, my_email} from "@script/stores";
+import type { Message, Member } from '@script/stores';
 import { useStore } from "@nanostores/preact";
 
 function isPermitableChat(id: string) {
 	const _chats = useStore(chats.$store)['default'] || [];
 
-	return !!_chats.filter(c => c.id === id).length
+	return {permited: !!_chats.filter(c => c.id === id).length, loading: _chats.loading}
 }
 
 function useLiveChat() {
 	const id = useStore(route)[1];
-	const permited = isPermitableChat(id);
+	const {permited, loading} = isPermitableChat(id);
 	const _members = useStore(members.$store)[id] || []
 	const _messages = useStore(messages.$store)[id] || [];
 	const _my_email = useStore(my_email);
@@ -23,13 +23,14 @@ function useLiveChat() {
 		}
 	}, [id, permited]);
 
-	return {_members, _messages, id, permited, email: _my_email}
+	const _loading = loading || _members.loading || _messages.loading
+
+	return {_members, _messages, id, permited, email: _my_email, loading: _loading}
 }
 
-import { createButtonEvent, createFormAction } from '@root/src/script/Form';
+import { createFormAction } from '@root/src/script/Form';
 import { Center } from '@root/src/ui/components/Material';
-import { ListBox, ChatUserMini, WritingArea } from '@root/src/ui/components/Chat';
-import type { VNode } from "preact";
+import { WritingArea } from '@root/src/ui/components/Chat';
 import MessagesView, {type MessagesViewReq} from "@root/src/ui/views/Messages";
 import MembersView from "@root/src/ui/views/Members";
 
@@ -39,7 +40,11 @@ function messagesReduce(
 	email: string
 ): MessagesViewReq["messages"] {
 	function reduce(message: Message) {
-		const member = members.find(mem => mem.ch_member.id === message.member)!.user
+		const member = members.find(mem => mem.ch_member.id === message.member)?.user
+		if (!member) {
+			console.warn("chat contains a message not of a member");
+			return null;
+		}
 		return {
 			picture: member.picture,
 			sent: message.sent,
@@ -49,17 +54,19 @@ function messagesReduce(
 			file: message.file
 		}
 	}
-	return messages.map(reduce);
+	return messages.map(reduce).filter(m => !!m)
 }
 
 export function ChatDisplay() {
 	const {
+		loading,
 		_members,
 		_messages,
 		id, permited, email
 	} = useLiveChat();
 
-	if (!email) return <Center><p>loading...</p></Center>
+	if (!email || loading) return <Center><p>loading...</p></Center>
+	if (!id) return (<Center><p>Start chat by selecting or creating one</p></Center>)
 
 	const submit = createFormAction([
 		'content',
@@ -68,6 +75,8 @@ export function ChatDisplay() {
 		const file = attachment.size ? attachment : null;
 		messages.send({id, content, file}, email); reset();
 	})
+
+
 
 	const ChatPort = (
 		<>
@@ -90,10 +99,10 @@ export function ChatDisplay() {
 		</>
 	)
 
+
 	return (
 		<>
-			{id ? !permited ? (<Center><p>404 Not Found</p></Center>) : ChatPort : (<Center><p>Start chat by selecting or creating one</p></Center>)
-			}
+			{ChatPort}
 		</>
 	);
 }

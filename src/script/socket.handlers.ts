@@ -32,7 +32,7 @@ export const onMessage = (ws: WebSocket) => (message: MessageEvent) => {
 			handler(ws, _message.content);
 		}
 	} catch (e: any) {
-		console.error("web socket parse error:",e.message);
+		console.warn("web socket parse error:",e.message);
 	}
 }
 

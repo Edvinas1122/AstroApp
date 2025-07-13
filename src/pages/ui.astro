@@ -1,0 +1,67 @@
+---
+import { Center } from "../ui/components/Material";
+import AppLayout from "./AppLayout.astro";
+import { Card } from "@ui/components/Material";
+import { MessageBox, WritingArea } from "../ui/components/Chat";
+import {SidePannelLayout} from "@ui/layouts/SidePannel"
+
+export const prerender = false;
+
+---
+<h1>Components</h1>
+<h2>Material</h2>
+<h3>Card</h3>
+<Card>
+    <slot slot="header">
+        <h2>Header</h2>
+    </slot>
+    <p>Card component</p>
+    <slot slot="footer">
+        <p>footer</p>
+    </slot>
+</Card>
+<h3>Center</h3>
+<Center>
+    <p>Center</p>
+</Center>
+
+<h2>Chat</h2>
+<SidePannelLayout
+    client:load
+>
+    <div
+        style={{
+            overflowY: "auto",
+            flex: 1,
+            height: "100%",
+            alignContent: "flex-end"
+        }}
+    >
+        <MessageBox
+        name="Victor"
+        content="test"
+        sent="20:21"
+        picture="https://cdn.pixabay.com/photo/2021/11/24/05/19/user-6820232_1280.png"
+        my={true}
+        ></MessageBox>
+    </div>
+    <WritingArea
+        submit={() => {}}
+        onSubmit={() => {}}
+    />
+</SidePannelLayout>
+<h2>Posts</h2>
+<SidePannelLayout
+    client:load
+>
+    <Card width="100%">
+    <slot slot="header">
+        <h2>Header</h2>
+    </slot>
+    <p>Card component</p>
+    <slot slot="footer">
+        <p>footer</p>
+    </slot>
+</Card>
+</SidePannelLayout>
+

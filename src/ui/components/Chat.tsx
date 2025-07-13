@@ -145,11 +145,12 @@ export const WritingArea = ({
 }: WritingAreaProps) => {
 
 	const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+	const [ready, setReady] = useState<boolean>(false);
 
 	const adjustHeight = (e: Event) => {
 		const textarea = e.target as HTMLTextAreaElement;
 		textarea.style.height = 'auto';
-		textarea.style.height = `${Math.min(textarea.scrollHeight, 120)}px`;
+		textarea.style.height = `${Math.min(textarea.scrollHeight - 20, 250)}px`;
 	};
 
 	const onFileChange = (event: Event) => {
@@ -193,27 +194,52 @@ export const WritingArea = ({
 		}
 	};
 
+	const handleReady = (e: Event) => {
+		(e.target as HTMLTextAreaElement).value.length > 2 ?
+			setReady(true) : setReady(false)
+	}
+
 	return (
-		<form className={styles.msgerInputarea} onSubmit={onSubmit} onReset={clearPreview}>
-			<label className={styles.fileButton}>
-				{previewUrl && renderPreview(previewUrl)}
-				<span className={styles.fileIcon}>📎</span>
-				<input
-					type="file"
-					name="attachment"
-					accept="image/*,application/pdf"
-					className={styles.fileInput}
-					onChange={onFileChange}
-				/>
-			</label>
-			<textarea name="content" placeholder="Enter your message..." 
-				className={styles.msgerInput}
+		<form
+			className={styles.typer}
+			onSubmit={onSubmit}
+			onReset={clearPreview}
+		>
+			{previewUrl && renderPreview(previewUrl)}
+			<textarea name="content" placeholder="Enter your message..."
+				rows={1}
 				onKeyDown={onStroke}
 				onInput={adjustHeight}
+				onInputCapture={handleReady}
 			/>
-			<button
-				className={styles.msgerSendBtn}
-			>Send</button>
+			<div class={styles.controls}>
+				<label
+					// className={styles.fileButton}
+					className={styles.circleBtn}
+				>
+					<span
+						// className={styles.fileIcon}
+					>+</span>
+					<input
+						style={{
+							position: "absolute",
+							display: "none"
+						}}
+						type="file"
+						name="attachment"
+						accept="image/*"
+						// className={styles.fileInput}
+						onChange={onFileChange}
+					/>
+				</label>
+				<button
+					
+					disabled={!ready}
+					className={
+						styles.circleBtn
+					}
+				>⬆</button>
+			</div>
 		</form>
 	)
 }

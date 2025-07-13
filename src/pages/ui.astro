@@ -8,6 +8,8 @@ import {SidePannelLayout} from "@ui/layouts/SidePannel"
 export const prerender = false;
 
 ---
+<AppLayout>
+
 <h1>Components</h1>
 <h2>Material</h2>
 <h3>Card</h3>
@@ -29,6 +31,9 @@ export const prerender = false;
 <SidePannelLayout
     client:load
 >
+    <slot slot="left">
+        
+    </slot>
     <div
         style={{
             overflowY: "auto",
@@ -46,6 +51,7 @@ export const prerender = false;
         ></MessageBox>
     </div>
     <WritingArea
+        client:load
         submit={() => {}}
         onSubmit={() => {}}
     />
@@ -64,4 +70,5 @@ export const prerender = false;
     </slot>
 </Card>
 </SidePannelLayout>
+</AppLayout>
 

@@ -1,3 +1,21 @@
+:root {
+  --medium: #e4e4e4;
+  --light: #e0e0e0;
+  --dark: #c8c8c8;
+  --bg: #fff;
+  --border: 1px solid var(--medium);
+  --right-msg-bg: #6e6e6e;
+}
+
+.dark {
+  --medium: #555555;
+  --light: #666666;
+  --dark: #888888;
+  --bg: #1e1e1e;
+  --border: 1px solid var(--medium);
+  --right-msg-bg: #333333;
+}
+
 .layout {
   display: flex;
   height: 100vh;
@@ -7,8 +25,8 @@
 .panel {
   padding: 1rem;
   overflow: auto;
-  border-right: 1px solid #e1e1e1;
-  border-left: 1px solid #e1e1e1;
+  border-right: var(--border);
+  border-left: var(--border);
 
   /* background-color: #f0f0f0; */
   /* box-sizing: border-box; */
@@ -18,17 +36,21 @@
 
 
 .center {
-  flex: 1;
+  display: flex;
+  flex-direction: column;
+  /* max-width: 500px; */
   /* padding: 1rem; */
+  /* padding: 5%; */
+  width: inherit;
   overflow: auto;
-  background-color: #ffffff;
+  background-color: var(--bg);
   box-sizing: border-box;
 }
 
 
 .cButton {
-  border: 1px solid #ffffff;
-  background-color: #ffffff;
+  border: var(--border);
+  background-color: var(--bg);
   color: #cacaca;
   /* border-color: rgb(223, 223, 223); */
   /* padding: 5px; */
@@ -38,11 +60,15 @@
 }
 
 .cButton:hover {
-  border: 1px solid #e1e1e1;
-  background-color: #f1f1f1;
+  border: var(--border);
+  background-color: var(--light)
 }
 
 .sideCtrl {
   display: flex;
   flex-direction: row-reverse;
+}
+
+.sideCtrl .right {
+  flex-direction: row;
 }

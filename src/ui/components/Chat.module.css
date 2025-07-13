@@ -1,9 +1,19 @@
 :root {
-  /* --body-bg: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); */
-  --msger-bg: #fff;
-  --border: 2px solid #ddd;
-  --left-msg-bg: #ececec;
-  --right-msg-bg: #579ffb;
+  --medium: #e4e4e4;
+  --light: #e0e0e0;
+  --dark: #c8c8c8;
+  --bg: #fff;
+  --border: 1px solid var(--medium);
+  --right-msg-bg: #6e6e6e;
+}
+
+.dark {
+  --medium: #555555;
+  --light: #666666;
+  --dark: #888888;
+  --bg: #1e1e1e;
+  --border: 1px solid var(--medium);
+  --right-msg-bg: #333333;
 }
 
 .chatPage {
@@ -26,7 +36,7 @@
 	height: calc(100% - 50px);
 	border: var(--border);
 	border-radius: 5px;
-	background: var(--msger-bg);
+	background: var(--bg);
 	box-shadow: 0 15px 15px -5px rgba(0, 0, 0, 0.2);
 }
 .msgerHeader {
@@ -76,7 +86,7 @@
 	max-width: 450px;
 	padding: 15px;
 	border-radius: 15px;
-	background: var(--left-msg-bg);
+	background: var(--gray);
 }
 .msgInfo {
   display: flex;
@@ -112,81 +122,80 @@
   margin: 0 0 0 10px;
 }
 
-.msgerInputarea {
+.typer {
   display: flex;
-  align-items: center;
-  padding: 12px;
-  background: #ffffff;
-  border-top: 1px solid #e0e0e0;
+  flex-direction: column;
+  /* align-items: center; */
+  border: var(--border);
   box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
-  border-radius: 12px;
-  margin: 8px;
-  gap: 8px;
+  border-radius: 24px;
+  gap: 0.5em;
+  margin: 2em;
+  padding: 1em;
 }
 
-.msgerInput {
-  flex: 1;
+.typer textarea {
+
   padding: 10px 12px;
-  border: 1px solid #e0e0e0;
+  border: none;
   border-radius: 8px;
-  background: #f5f5f5;
+
   font-size: 1rem;
   line-height: 1.5;
   resize: none; /* Prevent manual resizing */
   overflow-y: auto;
-  max-height: 120px; /* Max height for textarea */
-  transition: border-color 0.2s ease;
+
+  /* transition: border-color 0.2s ease; */
+  width: -webkit-fill-available;
 }
 
-.msgerInput:focus {
+.typer textarea::placeholder {
+  color: var(--light)
+}
+
+.typer textarea:focus {
   outline: none;
   border-color: #007bff;
-  background: #ffffff;
+  background: var(--bg)
 }
 
-.msgerSendBtn {
-  padding: 10px 16px;
-  background: #007bff;
-  color: #ffffff;
-  font-weight: 600;
-  border: none;
-  border-radius: 8px;
+.controls {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: -webkit-fill-available;
+  padding: 0.25em;
+}
+
+
+.circleBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* padding: 10px 16px; */
+  background: var(--bg);
+  color: #414141;
+  /* font-weight: 600; */
+  border: 1px solid #e0e0e0;
+  width: 50px;
+  height: 50px;
+  border-radius: 50px;
   cursor: pointer;
   transition: background 0.2s ease, transform 0.1s ease;
 }
 
-.msgerSendBtn:hover {
-  background: #0056b3;
+.circleBtn:disabled {
+  background: #ffffff;
+  color: #dedede;
+}
+
+.circleBtn:hover {
+  background: #e0e0e0;
   transform: translateY(-1px);
 }
 
-.msgerSendBtn:active {
+.circleBtn:active {
   transform: translateY(0);
-}
-
-.fileButton {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  background: #f5f5f5;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.2s ease;
-}
-
-.fileButton:hover {
-  background: #e0e0e0;
-}
-
-.fileIcon {
-  font-size: 1.2rem;
-}
-
-.fileInput {
-  display: none; /* Hide the default file input */
 }
 
 .previewContainer {
@@ -202,18 +211,18 @@
   max-height: 120px;
   object-fit: contain;
   border-radius: 8px;
-  border: 1px solid #e0e0e0;
+  border: 1px solid #a4a4a4;
 }
 
 .clearPreviewBtn {
   position: absolute;
-  top: -8px;
-  right: -8px;
+  bottom: -8px;
+  left: -8px;
   width: 24px;
   height: 24px;
-  background: #ff4d4f;
-  color: #ffffff;
-  border: none;
+  /* border: 1px solid; */
+  color: #ff8e8e;
+  border: 1px solid #ffc8c8;
   border-radius: 50%;
   font-size: 1rem;
   font-weight: bold;
@@ -225,12 +234,14 @@
 }
 
 .clearPreviewBtn:hover {
-  background: #d9363e;
+  border: 1px solid #ff5454;
+  color: #ff5454;
+
 }
 
 
 /* Ensure the form is responsive */
-@media (max-width: 600px) {
+/* @media (max-width: 600px) {
   .msgerInputarea {
     padding: 8px;
     margin: 4px;
@@ -249,6 +260,6 @@
     width: 36px;
     height: 36px;
   }
-}
+} */
 
 /* styles from https://codepen.io/sajadhsm/pen/odaBdd */

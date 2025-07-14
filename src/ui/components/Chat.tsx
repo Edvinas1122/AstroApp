@@ -116,18 +116,34 @@ function pickType(type: keyof typeof _file) {
 	}
 }
 
+import { Profile } from "./Material";
+
+export const MessageBubble = ({
+	file, content, children
+}: Omit<MessageProps, 'name' | 'sent' | 'my' | 'picture'> & {children?: VNode}) => (
+	<div className={styles.msgBubble}>
+		{children}
+		{file && pickType(file.type)(file.url)}
+		<div class={styles.msgText}>{content}</div>
+	</div>
+);
+
 export const MessageBox = ({ name, picture, sent, content, my, file }: MessageProps) => (
 	<div className={`${styles.msg} ${my ? styles.rightMsg : styles.leftMsg}`}>
-		<img
-			class={styles.msgImg}
+		<Profile
 			src={picture}
 			alt={name}
 		/>
-		<div className={styles.msgBubble}>
+		<MessageBubble
+			file={file}
+			content={content}
+		>
 			<div class={styles.msgInfo}>
 				<div class={styles.msgInfoName}>{name}</div>
 				<div class={styles.msgInfoTime}>{sent}</div>
 			</div>
+		</MessageBubble>
+		<div className={styles.msgBubble}>
 			{file && pickType(file.type)(file.url)}
 			<div class={styles.msgText}>{content}</div>
 		</div>

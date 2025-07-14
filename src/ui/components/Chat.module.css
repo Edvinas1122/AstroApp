@@ -67,6 +67,7 @@
 	align-items: flex-end;
 	margin-bottom: 10px;
 }
+
 .msg:last-of-type {
 	margin: 0;
 }
@@ -82,11 +83,13 @@
 }
 
 .msgBubble {
-	min-width: 250px;
+  width: fit-content;
+
 	max-width: 450px;
-	padding: 15px;
-	border-radius: 15px;
-	background: var(--gray);
+	padding: 6px 12px 14px;
+  margin: 5px;
+	border-radius: 18px;
+	background: var(--light);
 }
 .msgInfo {
   display: flex;
@@ -103,6 +106,7 @@
 }
 
 .msgText {
+  /* display: ruby-text; */
 	overflow-wrap: anywhere;
 }
 
@@ -182,11 +186,13 @@
   border-radius: 50px;
   cursor: pointer;
   transition: background 0.2s ease, transform 0.1s ease;
+  font-size: medium;
 }
 
 .circleBtn:disabled {
   background: #ffffff;
   color: #dedede;
+  font-size: small;
 }
 
 .circleBtn:hover {
@@ -236,9 +242,24 @@
 .clearPreviewBtn:hover {
   border: 1px solid #ff5454;
   color: #ff5454;
-
 }
 
+.msgSection {
+	display: flex;
+	/* align-items: flex-end; */
+  flex-direction: column;
+	/* margin-bottom: 10px; */
+  margin: 1rem;
+}
+
+.rightSec {
+	align-items: flex-end;
+}
+
+.rightSec .msgBubble {
+  color: var(--bg);
+  background-color: var(--right-msg-bg);
+}
 
 /* Ensure the form is responsive */
 /* @media (max-width: 600px) {

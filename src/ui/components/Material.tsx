@@ -101,3 +101,15 @@ export const Center = ({children, ...props}: CenterProps) => (
 		{children}
 	</div>
 );
+
+interface ProfileProps extends JSX.HTMLAttributes<HTMLImageElement> {
+	src: string,
+	alt: string
+}
+
+export const Profile = ({...props}: ProfileProps) => (
+	<img
+		{...props}
+		class={style.profile}
+	/>
+)

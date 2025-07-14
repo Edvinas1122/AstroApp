@@ -33,7 +33,6 @@ export function SidePannelLayout({
 
 	const toggleLeft = () => setMediaLeft(!mediaLeft)
 	const toggleRight = () => setMediaRight(!mediaRight)
-	const toggleDarkTheme = () => document.documentElement.classList.toggle('.dark');
 
 	const renderButton = (symbol: string, action: () => void) => <button
 		class={style.cButton}
@@ -66,7 +65,6 @@ export function SidePannelLayout({
 			>
                 {right}
 				<div class={style.sideCtrl + style.right}>
-				<button onClick={toggleDarkTheme}>theme</button>
 				{renderButton(mediaRight ? ">" : "<", toggleRight)}
 				</div>
             </aside>

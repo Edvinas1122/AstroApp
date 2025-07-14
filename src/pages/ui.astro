@@ -7,6 +7,52 @@ import {SidePannelLayout} from "@ui/layouts/SidePannel"
 
 export const prerender = false;
 
+interface Message {
+  id: number;
+  name: string;
+  content: string;
+  sent: string;
+  picture: string;
+  my: boolean;
+}
+
+export const messages: Message[] = [
+	{
+		id: 1,
+		name: 'Victor',
+		content: 'Hey, how are you?',
+		sent: '20:20',
+		picture: 'https://cdn.pixabay.com/photo/2021/11/24/05/19/user-6820232_1280.png',
+		my: false,
+	},
+	{
+		id: 2,
+		name: 'Victor',
+		content: 'Doing great! Just finished work.',
+		sent: '20:22',
+		picture: 'https://cdn.pixabay.com/photo/2021/11/24/05/19/user-6820232_1280.png',
+		my: false,
+	},
+	{
+		id: 3,
+		name: 'Me',
+		content: "I'm good, thanks! What about you?",
+		sent: '20:21',
+		picture: 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png',
+		my: true,
+	},
+	{
+		id: 4,
+		name: 'Me',
+		content: 'Nice! Let’s catch up later.',
+		sent: '20:23',
+		picture: 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png',
+		my: true,
+	},
+];
+
+import {Messages} from "@root/src/ui/components/MessageSection";
+
 ---
 <AppLayout>
 
@@ -31,9 +77,9 @@ export const prerender = false;
 <SidePannelLayout
     client:load
 >
-    <slot slot="left">
+    <!-- <slot slot="left">
         
-    </slot>
+    </slot> -->
     <div
         style={{
             overflowY: "auto",
@@ -42,13 +88,9 @@ export const prerender = false;
             alignContent: "flex-end"
         }}
     >
-        <MessageBox
-        name="Victor"
-        content="test"
-        sent="20:21"
-        picture="https://cdn.pixabay.com/photo/2021/11/24/05/19/user-6820232_1280.png"
-        my={true}
-        ></MessageBox>
+		<Messages
+			messages={messages}
+		/>
     </div>
     <WritingArea
         client:load

@@ -1,7 +1,5 @@
 ---
-import type { GetStaticPaths } from "astro";
 import AppLayout from "@root/src/pages/AppLayout.astro";
-import {ChatDisplay} from "./components/Messages"
 import { CreateChatModal, InviteModal } from "./components/Modal";
 import { Socket } from "@script/Socket";
 import { VirtualRouter } from "@script/Router";
@@ -40,8 +38,7 @@ const urls = fetch_urls[developement? "dev" : "prod"];
 				display: 'flex',
 				flexDirection: "row",
 				height: '100vh',
-				width: '100%',
-				// justifyContent: 'space-evenly'
+				width: '100%'
 			}}>
 				<InviteModal
 					client:load

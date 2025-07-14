@@ -119,9 +119,9 @@ function pickType(type: keyof typeof _file) {
 import { Profile } from "./Material";
 
 export const MessageBubble = ({
-	file, content, children
-}: Omit<MessageProps, 'name' | 'sent' | 'my' | 'picture'> & {children?: VNode}) => (
-	<div className={styles.msgBubble}>
+	file, content, children, loading
+}: Omit<MessageProps, 'name' | 'sent' | 'my' | 'picture'> & {children?: VNode, loading?: boolean}) => (
+	<div className={`${styles.msgBubble} ${loading && styles.msgLoading}`}>
 		{children}
 		{file && pickType(file.type)(file.url)}
 		<div class={styles.msgText}>{content}</div>

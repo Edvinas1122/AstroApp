@@ -248,6 +248,7 @@ function messagesReduce(
         return {
             picture: member.picture,
             sent: message.sent,
+			loading: message.sent === "sending..." || message.sent === "file_ok",
             content: message.content,
             name: member.name,
             my: member.user === email,

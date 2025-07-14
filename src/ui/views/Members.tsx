@@ -6,12 +6,11 @@ import { Center } from '@ui/components/Material';
 
 interface MembersViewReq {
     members: Member[],
-    invite: VNode
 }
 
 export default function MembersView({
     members,
-    invite
+
 }: MembersViewReq) {
 
     const admins = members.filter(memb => memb.role === 'admin');
@@ -25,11 +24,16 @@ export default function MembersView({
     />;
 
     return (
-        <ListBox
-            width='200px'
-            header={<>Members</>}
-            footer={invite}
-        >
+        // <ListBox
+        //     width='200px'
+        //     header={<>Members</>}
+        //     footer={invite}
+        // >
+        <div style={{
+            display: "flex",
+            flexDirection: "column",
+            overflowY: "scroll"    
+        }}>
             {members.length > 1 ? <><section>
                 <p>Admin</p>
                     {admins.map(renderMember)}
@@ -44,6 +48,7 @@ export default function MembersView({
                 </section>}</> 
                 : (<Center><p>Invite wonderers to chat with them</p></Center>)
             }
-        </ListBox>
+        </div>
+        // </ListBox>
     )
 }

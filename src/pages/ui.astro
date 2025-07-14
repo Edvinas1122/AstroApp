@@ -51,7 +51,60 @@ export const messages: Message[] = [
 	},
 ];
 
+export const dummyMembers: Member[] = [
+  {
+    online: true,
+    last_seen: undefined,
+    id: "1",
+    chat: "general",
+    user: "u1",
+    role: "admin",
+    about: "Loves coding and coffee.",
+    since: "2024-03-01T10:15:00Z",
+    picture: "https://cdn.pixabay.com/photo/2021/11/24/05/19/user-6820232_1280.png",
+    name: "Alice Johnson",
+  },
+  {
+    online: false,
+    last_seen: true,
+    id: "2",
+    chat: "general",
+    user: "u2",
+    role: "participant",
+    about: null,
+    since: "2024-05-10T14:00:00Z",
+    picture: "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png",
+    name: "Bob Smith",
+  },
+  {
+    online: undefined,
+    last_seen: false,
+    id: "3",
+    chat: "dev-chat",
+    user: "u3",
+    role: "invited",
+    about: "New here!",
+    since: null,
+    picture: "https://cdn.pixabay.com/photo/2022/05/10/12/44/user-7184390_1280.png",
+    name: "Clara Lin",
+  },
+  {
+    online: false,
+    last_seen: true,
+    id: "4",
+    chat: "support",
+    user: "u4",
+    role: "blocked",
+    about: "Was active before ban.",
+    since: "2023-12-25T08:30:00Z",
+    picture: "https://cdn.pixabay.com/photo/2021/09/15/07/43/user-6621385_1280.png",
+    name: "David Roe",
+  },
+];
+
+
 import {Messages} from "@root/src/ui/components/MessageSection";
+import MembersView from "../ui/views/Members";
 
 ---
 <AppLayout>
@@ -77,9 +130,12 @@ import {Messages} from "@root/src/ui/components/MessageSection";
 <SidePannelLayout
     client:load
 >
-    <!-- <slot slot="left">
-        
-    </slot> -->
+    <slot slot="right">
+        <MembersView
+            members={dummyMembers}
+
+        />
+    </slot>
     <div
         style={{
             overflowY: "auto",

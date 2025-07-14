@@ -77,7 +77,6 @@ function formatDate(date: Date) {
 
 const set_rand_id = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
 
-
 class MessageStore extends PageStore<Message & {}> {
 	private file_resource_link = "https://pub-55793912e84f48a381166c13aae1eca8.r2.dev";
 
@@ -178,6 +177,7 @@ export const messages = new MessageStore(
 	(params) => actions.chat.messages(params).then(handleResult<Message[]>)
 )
 
+
 export const $socket = atom<WebSocket | null>(null);
 
 export const $invite_modal = atom<boolean>(false);
@@ -227,5 +227,93 @@ export const chats = new ChatStore({},
 	(params) => actions.chat.chats(params).then(handleResult<Chat[]>)
 );
 
-export const route = atom<string[]>([]);
+export const route = atom<string[] | null>(null);
 export const my_email = atom<string | null>(null);
+
+
+import { useStore } from "@nanostores/preact";
+import { useEffect } from "preact/hooks";
+
+function messagesReduce(
+    messages: Message[],
+    members: Member[],
+    email: string
+) {
+    function reduce(message: Message) {
+        const member = members.find(mem => mem.id === message.member)
+        if (!member) {
+            console.warn("chat contains a message not of a member");
+            return null;
+        }
+        return {
+            picture: member.picture,
+            sent: message.sent,
+            content: message.content,
+            name: member.name,
+            my: member.user === email,
+            file: message.file
+        }
+    }
+    return messages.map(reduce).filter(m => !!m)
+}
+
+type RoomMessagesResult =
+  | { status: "not ready"}
+  | { status: "no route" }
+  | {
+      status: "ready";
+      messages: {
+		picture: string;
+		sent: string;
+		content: string;
+		name: string;
+		my: boolean;
+		file: file | null | undefined;
+	}[];
+      members: Member[];
+      loading: boolean;
+      update: () => void;
+      send: (input: { content: string; file: File | null }) => void;
+    };
+
+export function withRoomMessages(): RoomMessagesResult {
+	const c_route = useStore(route);
+	const email = useStore(my_email);
+	const msg = useStore(messages.$store);
+	const memb = useStore(members.$store);
+
+	const id = c_route?.[1];
+
+	useEffect(() => {
+		if (!id || !email) return;
+		messages.fetch(id);
+		members.fetch(id);
+	}, [id, email]);
+
+	if (!c_route || !email) {
+		return {
+			status: "not ready"
+		}
+	}
+
+	if (!id) {
+		return {
+			status: "no route"
+		}
+	}
+	const rd_messages = messagesReduce(
+		messages.get(id),
+		members.get(id),
+		email
+	)
+
+	return {
+		status: "ready",
+		messages: rd_messages,
+		members: members.get(id),
+		loading: messages.isLoading(id) || members.isLoading(id),
+		update: () => messages.fetch(id),
+		send: (input: {content: string, file: File | null}) => 
+			messages.send({id: id, ...input}, email)
+	}
+}

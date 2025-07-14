@@ -44,7 +44,7 @@ import { Profile } from "./Material";
 
 function render<Message extends MReq>(
     renderMessage: (m: Message) => VNode,
-    sections: MessageSection<Message>[]
+    sections: MessageSection<Message>[],
 ) {
     const sectionRender = (data: MessageSection<Message>) => (
         <div
@@ -85,23 +85,36 @@ function MessageSections<
 	Message extends MReq
 >(props: {
 	messages: Message[],
-	renderMessage: (message: Message) => VNode
+	renderMessage: (message: Message) => VNode,
+    emptyDisplay: VNode,
 }) {
 	const sections = reduce(props.messages);
-	return render(props.renderMessage, sections);
+	return sections.length ? render(props.renderMessage, sections) : props.emptyDisplay
 }
 
 function buildMessageSections<
 	Message extends MReq
 >(
-	renderMessage: (props: any) => VNode
+	renderMessage: (props: any) => VNode,
+    emptyDisplay: VNode,
 ) {
 	return (props: {messages: Message[]}) => MessageSections({
 		renderMessage,
-		messages: props.messages
+		messages: props.messages,
+        emptyDisplay
 	})
 }
 
 import { MessageBubble } from "./Chat";
+import { Center } from "./Material";
 
-export const Messages = buildMessageSections(MessageBubble) 
+const EmptyMessage = (
+    <Center
+        style={{height: "100%"}}
+    ><p>{`🧙 Epic chat starts with a message ✉️`}</p></Center>
+)
+
+export const Messages = buildMessageSections(
+    MessageBubble,
+    EmptyMessage
+) 

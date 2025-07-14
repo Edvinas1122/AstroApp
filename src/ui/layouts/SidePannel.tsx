@@ -8,66 +8,90 @@ interface SidePannelLayoutProps {
     class?: string;
 }
 
-export function SidePannelLayout({
-	left,
-	children,
-	right,
-	class: className = '',
-}: SidePannelLayoutProps) {
-
-	const [mediaLeft, setMediaLeft] = useState(false);
-	const [mediaRight, setMediaRight] = useState(false);
+function withTogglePannel() {
+	const [media, setMedia] = useState(false);
 
 	const scaleHandle = (ev: MediaQueryListEvent) => {
-		console.log('scale trigger :)', ev.matches);
-		setMediaLeft(ev.matches);
-		setMediaRight(ev.matches);
+		setMedia(ev.matches);
 	}
 
 	useEffect(() => {
 		const ob = window.matchMedia("(width > 820px)");
-		setMediaLeft(ob.matches); setMediaRight(ob.matches);
+		setMedia(ob.matches); 
 		ob.addEventListener('change', scaleHandle);
 		return () => ob.removeEventListener('change', scaleHandle);
 	}, [])
 
-	const toggleLeft = () => setMediaLeft(!mediaLeft)
-	const toggleRight = () => setMediaRight(!mediaRight)
+	const toggle = () => setMedia(!media)
 
-	const renderButton = (symbol: string, action: () => void) => <button
-		class={style.cButton}
-		onClick={action}
-	>
-		{symbol}
-	</button>
+	return {media, toggle}
+
+}
+
+const renderButton = (symbol: string, action: () => void) => <button
+	class={style.cButton}
+	onClick={action}
+>
+	{symbol}
+</button>
+
+export function SidePannelLayout({
+	left,
+	children,
+	class: className = '',
+}: SidePannelLayoutProps) {
+	const {media, toggle} = withTogglePannel();
 
 	return (
 		<div class={`${style.layout} ${className}`}>
 			<aside class={style.panel} 
 				style={{
 					maxWidth: "200px",
-					width: mediaLeft ? "20%" : "30px"
+					width: media ? "20%" : "30px"
 				}}
 			>
 				{left}
 				<div class={style.sideCtrl}>
-				{renderButton(mediaLeft ? "<" : ">", toggleLeft)}
+				{renderButton(media ? "<" : ">", toggle)}
 				</div>
             </aside>
             <main class={style.center}>
                 {children}
             </main>
-            <aside class={style.panel}
-				style={{
-					maxWidth: "250px",
-					width: mediaRight ? "20%" : "30px"
-				}}
-			>
-                {right}
-				<div class={style.sideCtrl + style.right}>
-				{renderButton(mediaRight ? ">" : "<", toggleRight)}
-				</div>
-            </aside>
         </div>
     );
+}
+
+interface RightPannelLayoutProps {
+    right?: preact.ComponentChildren;
+    children?: preact.ComponentChildren;
+    class?: string;
+}
+
+export function RightPannelLayout({
+	right,
+	children,
+	class: className = '',
+}: RightPannelLayoutProps) {
+
+	const { media, toggle } = withTogglePannel();
+
+	return (
+		<div class={`${style.layout} ${className}`}>
+			<main class={style.center}>
+				{children}
+			</main>
+			<aside class={style.panel}
+				style={{
+					maxWidth: "250px",
+					width: media ? "20%" : "30px"
+				}}
+			>
+				{right}
+				<div class={`${style.sideCtrl} ${style.right}`}>
+					{renderButton(media ? ">" : "<", toggle)}
+				</div>
+			</aside>
+		</div>
+	);
 }

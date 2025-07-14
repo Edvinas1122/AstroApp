@@ -6,6 +6,8 @@ import { CreateChatModal, InviteModal } from "./components/Modal";
 import { Socket } from "@script/Socket";
 import { VirtualRouter } from "@script/Router";
 import ChatList from "./components/Chats";
+import { SidePannelLayout } from "@root/src/ui/layouts/SidePannel";
+import ChatRoomPort from "./components/ChatPort";
 
 const fetch_urls = {
 	dev: {
@@ -39,7 +41,7 @@ const urls = fetch_urls[developement? "dev" : "prod"];
 				flexDirection: "row",
 				height: '100vh',
 				width: '100%',
-				justifyContent: 'space-evenly'
+				// justifyContent: 'space-evenly'
 			}}>
 				<InviteModal
 					client:load
@@ -47,12 +49,18 @@ const urls = fetch_urls[developement? "dev" : "prod"];
 				<CreateChatModal
 					client:load
 				/>
-				<ChatList
+				<SidePannelLayout
 					client:load
-				/>
-				<ChatDisplay
-					client:load
-				/>
+				>
+					<slot slot="left">
+						<ChatList
+							client:load
+						/>
+					</slot>
+					<ChatRoomPort
+						client:load
+					/>
+				</SidePannelLayout>
 			<div>
 		</Socket>
 	</VirtualRouter>

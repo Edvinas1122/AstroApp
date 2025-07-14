@@ -9,8 +9,9 @@ import { Center } from "@root/src/ui/components/Material";
 
 export default function ChatList() {
 	const _chats = useStore(chats.$store)['default'] || [];
-	const currentSelect = useStore(route)[1];
-	
+	// const currentSelect = useStore(route)[1];
+	const currentSelect = () => window.location.href.split("/")[2]
+
 	useEffect(() => {
 		chats.fetch('default');
 	}, [])
@@ -18,7 +19,7 @@ export default function ChatList() {
 
 	const renderChat = (interact: (id: string) => VNode) => (item: Chat) => {
 		const id = item.id;
-		const selected = id === currentSelect;
+		const selected = id === currentSelect();
 		const link = () => window.history.pushState({}, '', `/chat/${id}`);
 		return (
 			<div
@@ -51,7 +52,7 @@ export default function ChatList() {
 			e.stopPropagation();
 			chats.delete({id: _id}).then(() => {
 
-				if (currentSelect === _id) {
+				if (currentSelect() === _id) {
 					window.history.replaceState({}, '', '/chat')
 				}
 				reset();
@@ -103,16 +104,17 @@ export default function ChatList() {
 
 	return (
 		<>
-			<ListBox
+			{/* <ListBox
 				width='200px'
 				header={<>Chats</>}
 				footer={
 					<button onClick={() => $createChat_modal.set(true)}>Create Chat</button>
-				}>
+				}> */}
 				<>
 					{_chats.loading ? LoadingView : ListPort}
+					<button onClick={() => $createChat_modal.set(true)}>Create Chat</button>
 				</>
-			</ListBox>
+			{/* </ListBox> */}
 		</>
 	);
 }

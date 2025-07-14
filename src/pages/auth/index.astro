@@ -21,12 +21,16 @@ const google_link = generateGoogleOAuthURL({
 	redirectUri: urls.auth_redirect
 });
 
+export const prerender = false
+
 import AppLayout from '../AppLayout.astro';
-import { Card } from "../../ui/components/Material";
+import { Card, Center } from "../../ui/components/Material";
 import GoogleSignInButton from "../../ui/components/GoogleSignIn"
+import { fade } from "astro:transitions";
 ---
 
 <AppLayout>
+	<Center style={{height: "100vh"}}>
 	<Card>
 		<slot slot="header">
 			<h1>Splash</h1>
@@ -42,5 +46,5 @@ import GoogleSignInButton from "../../ui/components/GoogleSignIn"
 			<a href="/terms">Privacy Terms</a>
 		</slot>
 	</Card>
-
+	</Center>
 </AppLayout>

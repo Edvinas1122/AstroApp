@@ -11,25 +11,16 @@ export type Message = {
 type file = {type: "image" | "video", url: string};
 
 export type Member = {
-	online: boolean | undefined,
-	last_seen: number | undefined,
-	ch_member: {
-		id: string;
-		chat: string;
-		user: string;
-		role: "invited" | "blocked" | "participant" | "admin" | null;
-		about: string | null;
-		since: string | null;
-	};
-	user: {
-		email: string;
-		given_name: string;
-		family_name: string;
-		name: string;
-		picture: string;
-		sub: string;
-		signed: string | null;
-	};
+    online: boolean | undefined;
+    last_seen: boolean | undefined;
+    id: string;
+    chat: string;
+    user: string;
+    role: "invited" | "blocked" | "participant" | "admin" | null;
+    about: string | null;
+    since: string | null;
+    picture: string;
+    name: string;
 }
 
 export type Chat = {
@@ -56,7 +47,7 @@ class MemberStore extends PageStore<Member> {
 	}
 
 	me(chat_id: string, email: string) {
-		const member = this.find(chat_id, (m) => m.user.email === email);
+		const member = this.find(chat_id, (m) => m.user === email);
 		if (!member) throw new Error('not a chat member');
 		return member;
 	}
@@ -117,7 +108,7 @@ class MessageStore extends PageStore<Message & {}> {
 		this.set(input.id, {
 			id: rand_id,
 			chat: input.id,
-			member: me_member.ch_member.id,
+			member: me_member.id,
 			sent: 'sending...',
 			content: input.content,
 			file: input.file ? {

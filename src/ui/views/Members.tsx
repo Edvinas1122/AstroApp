@@ -14,13 +14,13 @@ export default function MembersView({
     invite
 }: MembersViewReq) {
 
-    const admins = members.filter(memb => memb.ch_member.role === 'admin');
-    const participants = members.filter(memb => memb.ch_member.role === 'participant');
-    const invited = members.filter(memb => memb.ch_member.role === 'invited');
+    const admins = members.filter(memb => memb.role === 'admin');
+    const participants = members.filter(memb => memb.role === 'participant');
+    const invited = members.filter(memb => memb.role === 'invited');
 
     const renderMember = (item: Member) => <ChatUserMini 
-            picture={{url: item.user.picture, alt: `profile-icon-${item.user.given_name}`}}
-            name={item.user.given_name}
+            picture={{url: item.picture, alt: `profile-icon-${item.name}`}}
+            name={item.name}
             online={item.online}
     />;
 

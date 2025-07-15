@@ -21,7 +21,7 @@
 	flex-direction: row;
 	justify-content: center;
 	align-items: center;
-	height: 100vh;
+	height: -webkit-fill-available;
 	background-image: var(--body-bg);
 	font-family: Helvetica, sans-serif;
 }

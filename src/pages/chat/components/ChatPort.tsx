@@ -55,7 +55,7 @@ export default function ChatRoomPort() {
             submit={submit.form}
             />
         </div>
-         </RightPannelLayout>
+        </RightPannelLayout>
     )
 }
 

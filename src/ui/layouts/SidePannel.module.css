@@ -19,6 +19,7 @@
 .layout {
   display: flex;
   height: -webkit-fill-available;
+  overflow: auto;
   width: 100%;
 }
 

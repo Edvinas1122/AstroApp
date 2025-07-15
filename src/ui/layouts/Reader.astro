@@ -1,0 +1,25 @@
+---
+import AppLayout from "./AppLayout.astro";
+---
+<AppLayout>
+    <style>
+        .reader {
+            display: flex;
+            flex-direction: column;
+            max-width: 800px;
+            margin: auto;
+            padding: 1rem;
+
+        }
+        .port {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+        }
+    </style>
+    <main class="port">
+        <div class="reader">
+            <slot/>
+        </div>
+    </main>
+</AppLayout>

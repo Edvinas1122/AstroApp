@@ -21,12 +21,12 @@ const google_link = generateGoogleOAuthURL({
 	redirectUri: urls.auth_redirect
 });
 
-export const prerender = false
+export const prerender = true
 
-import AppLayout from '../AppLayout.astro';
+import AppLayout from "@ui/layouts/AppLayout.astro";
 import { Card, Center } from "../../ui/components/Material";
 import GoogleSignInButton from "../../ui/components/GoogleSignIn"
-import { fade } from "astro:transitions";
+
 ---
 
 <AppLayout>

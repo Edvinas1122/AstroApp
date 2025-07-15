@@ -73,3 +73,7 @@
 .sideCtrl .right {
   flex-direction: row;
 }
+
+.header {
+  border-bottom: var(--border);
+}

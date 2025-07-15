@@ -5,6 +5,7 @@ import { Socket } from "@script/Socket";
 import { VirtualRouter } from "@script/Router";
 import ChatList from "./components/Chats";
 import { SidePannelLayout } from "@root/src/ui/layouts/SidePannel";
+import TopBarLayout from "@root/src/ui/layouts/TopBar";
 import ChatRoomPort from "./components/ChatPort";
 
 const fetch_urls = {
@@ -54,9 +55,14 @@ const urls = fetch_urls[developement? "dev" : "prod"];
 							client:load
 						/>
 					</slot>
-					<ChatRoomPort
-						client:load
-					/>
+					<TopBarLayout>
+						<slot slot="header">
+							<div> test</div>
+						</slot>
+						<ChatRoomPort
+							client:load
+						/>
+					</TopBarLayout>
 				</SidePannelLayout>
 			<div>
 		</Socket>

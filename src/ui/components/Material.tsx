@@ -1,7 +1,7 @@
 import { h } from 'preact';
 import style from './Material.module.css';
-import { useRef, useEffect } from 'preact/hooks';
-import type { JSX, VNode } from 'preact';
+import { useRef, useEffect, useState } from 'preact/hooks';
+import type { ComponentChild, JSX, VNode } from 'preact';
 
 interface CardProps {
     header?: preact.ComponentChildren;
@@ -68,10 +68,20 @@ export function Modal({
 	};
 
 	const Headers = () => (
-		<>
+		<div
+			style={{
+				display: "flex",
+				flexDirection: "row",
+    			justifyContent: "space-between"
+			}}
+		>
 			{props.header}
-			<button onClick={close}>X</button>
-		</>
+			<button
+				onClick={close}
+				class={style.circleBtn}
+				style={{height: "23px", width: "23px"}}
+			>X</button>
+		</div>
 	);
 	return (
 	<>
@@ -113,3 +123,84 @@ export const Profile = ({...props}: ProfileProps) => (
 		class={style.profile}
 	/>
 )
+
+// interface CircleButtonProps extends JSX.HTMLAttributes<HTMLButtonElement> {
+// 	children: VNode,
+// } 
+
+// export const CircleButton = ({children, ...props}: CircleButtonProps) =>
+// 	<button {...props} class={style.circleBtn}>
+// 		{children}
+// 	</button>
+
+interface RoomTabletProps extends JSX.HTMLAttributes<HTMLDivElement> {
+	children: ComponentChild,
+	interf: VNode,
+	selected: boolean
+}
+
+export function OptionsTablet({
+	children, interf, selected, ...props
+}: RoomTabletProps) {
+	const [options, setOptions] = useState<{state: boolean, timer?:  NodeJS.Timeout}>({
+		state: false,
+	});
+
+	const hide = () => {
+		const timer = setTimeout(() => {
+			setOptions({
+				state: false,
+			})
+		}, 130);
+		setOptions({state: true, timer})
+	}
+
+	const show = () => {
+		clearTimeout(options.timer);
+		setOptions({state: true})
+	}
+
+	const toggle = (e: Event) => {
+		e.stopPropagation();
+		setOptions({state: !options.state});
+	}
+
+	return (
+		<div {...props}
+			class={`${style.tablet} ${selected && style.selected}`}
+		>
+			{children}
+			<button onClick={toggle}
+				onMouseEnter={show}
+				onMouseLeave={hide}
+				class={style.circleBtn} style={{height: "25px", width: "25px"}}>
+				<>˅</>
+			</button>
+			{options.state && <div class={style.pop} onMouseEnter={show}
+				onMouseLeave={hide}
+			>
+			{interf}
+			</div>}
+		</div>
+	)
+}
+
+interface OptionProps extends JSX.HTMLAttributes<HTMLDivElement> {
+	label?: string;
+	icon?: string;
+	disabled: boolean;
+	onClick: (e: Event) => void
+	// children: ComponentChild;
+}
+
+export function Option({ disabled, label = "Delete", icon = "🗑︎", ...props }: OptionProps) {
+	const click = (e: Event) => {e.stopPropagation(), props.onClick(e)}
+	return (
+		<div {...props} class={style.option} onClick={click}>
+			<p>{label}</p>
+			<label style={{cursor: "pointer"}}>
+				{icon}
+			</label>
+		</div>
+	);
+}

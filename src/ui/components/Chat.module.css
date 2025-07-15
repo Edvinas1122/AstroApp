@@ -268,26 +268,3 @@
   background-color: var(--right-msg-bg);
 }
 
-/* Ensure the form is responsive */
-/* @media (max-width: 600px) {
-  .msgerInputarea {
-    padding: 8px;
-    margin: 4px;
-  }
-
-  .msgerInput {
-    font-size: 0.9rem;
-  }
-
-  .msgerSendBtn {
-    padding: 8px 12px;
-    font-size: 0.9rem;
-  }
-
-  .fileButton {
-    width: 36px;
-    height: 36px;
-  }
-} */
-
-/* styles from https://codepen.io/sajadhsm/pen/odaBdd */

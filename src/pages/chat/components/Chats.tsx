@@ -1,16 +1,15 @@
 import { useEffect } from "preact/hooks";
 import {chats, $createChat_modal, route } from "@script/stores";
-import type { Chat} from '@script/stores';
+import type { Chat } from '@script/stores';
 import { useStore } from "@nanostores/preact";
-import { ListBox } from "@ui/components/Chat";
 import type { VNode } from "preact";
 import { createButtonEvent } from "@script/Form";
-import { Center } from "@root/src/ui/components/Material";
+import { OptionsTablet, Option } from "@ui/components/Material";
+
 
 export default function ChatList() {
 	const _chats = useStore(chats.$store)['default'] || [];
-	// const currentSelect = useStore(route)[1];
-	const currentSelect = () => window.location.href.split("/")[2]
+	const currentSelect = useStore(route);
 
 	useEffect(() => {
 		chats.fetch('default');
@@ -19,28 +18,19 @@ export default function ChatList() {
 
 	const renderChat = (interact: (id: string) => VNode) => (item: Chat) => {
 		const id = item.id;
-		const selected = id === currentSelect();
+		const selected = id === currentSelect?.at(1);
 		const link = () => window.history.pushState({}, '', `/chat/${id}`);
-		return (
-			<div
-				style={{
-					boxShadow: selected ? '0 0 0 2px #3b82f6' : 'none',
-					backgroundColor: selected ? '#eff6ff' : 'transparent',
-					borderRadius: '8px',
-					padding: '12px',
-					margin: '4px 0',
-					transition: 'all 0.2s ease',
-					cursor: 'pointer',
-					// Add other styles as needed
-				}}
-				onClick={link}
-			>
-				<p>
-					<>{item.name}</>
-				</p>
-				{interact(id)}
-			</div>
-		)
+		return <OptionsTablet
+					interf={interact(id)}
+					onClick={link}
+					selected={selected}>
+					<>
+						<p>
+							<>{item.name}</>
+						</p>
+						{/* {interact(id)} */}
+					</>
+			</OptionsTablet>
 	}
 
 	const myChats = _chats.filter(chat => chat.my_role === 'admin');
@@ -52,16 +42,14 @@ export default function ChatList() {
 			e.stopPropagation();
 			chats.delete({id: _id}).then(() => {
 
-				if (currentSelect() === _id) {
+				if (currentSelect?.at(1) === _id) {
 					window.history.replaceState({}, '', '/chat')
 				}
 				reset();
 			})
 		})
-		return	<button
-					disabled={action.loading}
-					onClick={action}
-			>Delete</button>
+		return <Option onClick={action} label="Delete" icon="🗑︎"
+			disabled={action.loading} style={{color: "red"}}/>
 		
 	});
 
@@ -84,17 +72,17 @@ export default function ChatList() {
 	</div>)
 
 	const ListPort = (<>{!!invited.length && <section>
-						<p>{`Invited (${invited.length})`}</p>
-						{invited.map(renderInvitedChats)}
-					</section>}
-					{!!myChats.length && <section>
-						<p>{`My Chats (${myChats.length})`}</p>
-						{myChats.map(renderMyChat)}
-					</section>}
-					{!!participantChats.length && <section>
-						<p>{`Participants (${participantChats.length})`}</p>
-						{participantChats.map(renderParticipantChats)}
-					</section>}</>)
+			<p>{`Invited (${invited.length})`}</p>
+			{invited.map(renderInvitedChats)}
+		</section>}
+		{!!myChats.length && <section>
+			<p>{`My Chats (${myChats.length})`}</p>
+			{myChats.map(renderMyChat)}
+		</section>}
+		{!!participantChats.length && <section>
+			<p>{`Participants (${participantChats.length})`}</p>
+			{participantChats.map(renderParticipantChats)}
+		</section>}</>)
 
 	const LoadingView = (
 		<section>
@@ -104,17 +92,8 @@ export default function ChatList() {
 
 	return (
 		<>
-			{/* <ListBox
-				width='200px'
-				header={<>Chats</>}
-				footer={
-					<button onClick={() => $createChat_modal.set(true)}>Create Chat</button>
-				}> */}
-				<>
-					{_chats.loading ? LoadingView : ListPort}
-					<button onClick={() => $createChat_modal.set(true)}>Create Chat</button>
-				</>
-			{/* </ListBox> */}
+		{_chats.loading ? LoadingView : ListPort}
+		<button onClick={() => $createChat_modal.set(true)}>Create Chat</button>
 		</>
 	);
 }

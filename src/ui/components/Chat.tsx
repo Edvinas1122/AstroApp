@@ -1,6 +1,6 @@
 import type { FormEvent } from "preact/compat";
 import styles from "./Chat.module.css"
-import type { VNode } from "preact";
+import type { VNode, JSX } from "preact";
 import { useState } from "preact/hooks";
 
 
@@ -259,3 +259,5 @@ export const WritingArea = ({
 		</form>
 	)
 }
+
+

@@ -18,7 +18,7 @@
 
 .layout {
   display: flex;
-  height: 100vh;
+  height: -webkit-fill-available;
   width: 100%;
 }
 

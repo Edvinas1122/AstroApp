@@ -38,7 +38,7 @@ export function InviteModal() {
 
 	const submit = createFormAction(['email'], ({email}, reset) => {
 		const id = currentSelect?.at(1);
-		console.log("modal: ", id)
+		if (!id) throw new Error('no chat id in invite form');
 		members.invite({id, user: email}).then(memb => {
 			$invite_modal.set(false); reset();
 		}).catch((res: any) => {

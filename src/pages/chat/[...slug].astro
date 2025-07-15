@@ -7,6 +7,7 @@ import ChatList from "./components/Chats";
 import { SidePannelLayout } from "@root/src/ui/layouts/SidePannel";
 import TopBarLayout from "@root/src/ui/layouts/TopBar";
 import ChatRoomPort from "./components/ChatPort";
+import Headers from "@ui/views/Headers"
 
 const fetch_urls = {
 	dev: {
@@ -57,7 +58,7 @@ const urls = fetch_urls[developement? "dev" : "prod"];
 					</slot>
 					<TopBarLayout>
 						<slot slot="header">
-							<div> test</div>
+							<Headers/>
 						</slot>
 						<ChatRoomPort
 							client:load

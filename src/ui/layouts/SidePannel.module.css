@@ -74,6 +74,10 @@
   flex-direction: row;
 }
 
-.header {
+.header_bar {
   border-bottom: var(--border);
+  min-height: 40px;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
 }

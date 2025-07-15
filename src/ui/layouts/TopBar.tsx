@@ -1,4 +1,4 @@
-import type { ComponentChildren, VNode } from "preact"
+import type { ComponentChildren } from "preact"
 import styles from "./SidePannel.module.css"
 
 interface TobBarLayoutProps {
@@ -12,7 +12,7 @@ export default function TopBarLayout({
 }: TobBarLayoutProps) {
     return (
         <>
-            <header style={styles.header}>
+            <header class={styles.header_bar}>
                 {header}
             </header>
             <>

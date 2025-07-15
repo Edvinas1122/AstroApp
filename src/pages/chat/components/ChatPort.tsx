@@ -1,7 +1,7 @@
 import { $invite_modal, withRoomMessages } from "@script/stores";
 import { createFormAction } from "@root/src/script/Form";
-import { Messages } from "@root/src/ui/components/MessageSection";
-import { WritingArea } from "@root/src/ui/components/Chat";
+import { Messages } from "@ui/components/MessageSection";
+import { WritingArea } from "@ui/components/Chat";
 import { RightPannelLayout } from "@ui/layouts/SidePannel";
 
 
@@ -9,9 +9,9 @@ export default function ChatRoomPort() {
     const data = withRoomMessages();
 
     if (data.status === "not ready") {
-        return <p>Loading</p>
+        return <Center><p>loading</p></Center>
     } else if (data.status === "no route") {
-        return <p>no route</p>
+        return <Center><p>no route</p></Center>
     }
 
     const submit = createFormAction([
@@ -34,7 +34,7 @@ export default function ChatRoomPort() {
 				<MembersView
 					members={data.members}
 					/>
-                <button onClick={() => $invite_modal.set(true)}>Invite</button>
+                <Button onClick={() => $invite_modal.set(true)}><>Invite</></Button>
 				</>
 			}
 		>
@@ -62,7 +62,7 @@ export default function ChatRoomPort() {
 import { useRef, useEffect  } from "preact/hooks";
 import type { ComponentChild } from "preact";
 import MembersView from "@root/src/ui/views/Members";
-import { Center } from "@root/src/ui/components/Material";
+import { Button, Center } from "@root/src/ui/components/Material";
 
 interface ScrollBottomContainerProps {
 	children: ComponentChild

@@ -124,6 +124,15 @@ export const Profile = ({...props}: ProfileProps) => (
 	/>
 )
 
+interface CircleButtonProps extends JSX.HTMLAttributes<HTMLButtonElement> {
+	children: VNode,
+} 
+
+export const Button = ({children, ...props}: CircleButtonProps) =>
+	<button {...props} class={style.button}>
+		{children}
+	</button>
+
 // interface CircleButtonProps extends JSX.HTMLAttributes<HTMLButtonElement> {
 // 	children: VNode,
 // } 

@@ -30,14 +30,15 @@ function withFocus(open: boolean) {
 }
 
 export function InviteModal() {
-	const currentSelect = () => window.location.href.split("/")[1]
+	const currentSelect = useStore(route);
 	const open = useStore($invite_modal);
 	const focusRef = withFocus(open);
 	const [users, setUsers] = useState<User[]>([]);
 	const [online, setOnline] = useState(0);
 
 	const submit = createFormAction(['email'], ({email}, reset) => {
-		const id = currentSelect();
+		const id = currentSelect?.at(1);
+		console.log("modal: ", id)
 		members.invite({id, user: email}).then(memb => {
 			$invite_modal.set(false); reset();
 		}).catch((res: any) => {

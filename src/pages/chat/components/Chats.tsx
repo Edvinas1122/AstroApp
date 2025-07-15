@@ -4,7 +4,7 @@ import type { Chat } from '@script/stores';
 import { useStore } from "@nanostores/preact";
 import type { VNode } from "preact";
 import { createButtonEvent } from "@script/Form";
-import { OptionsTablet, Option } from "@ui/components/Material";
+import { OptionsTablet, Option, Button } from "@ui/components/Material";
 
 
 export default function ChatList() {
@@ -16,13 +16,14 @@ export default function ChatList() {
 	}, [])
 
 
-	const renderChat = (interact: (id: string) => VNode) => (item: Chat) => {
+	const renderChat = (interact: (id: string) => VNode) => (item: Chat, i: number) => {
 		const id = item.id;
 		const selected = id === currentSelect?.at(1);
 		const link = () => window.history.pushState({}, '', `/chat/${id}`);
 		return <OptionsTablet
 					interf={interact(id)}
 					onClick={link}
+					style={{zIndex: 30 - i}}
 					selected={selected}>
 					<>
 						<p>
@@ -93,7 +94,7 @@ export default function ChatList() {
 	return (
 		<>
 		{_chats.loading ? LoadingView : ListPort}
-		<button onClick={() => $createChat_modal.set(true)}>Create Chat</button>
+		<Button onClick={() => $createChat_modal.set(true)}><>Create Chat</></Button>
 		</>
 	);
 }

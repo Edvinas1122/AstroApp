@@ -11,11 +11,9 @@ import Headers from "@ui/views/Headers"
 
 const fetch_urls = {
 	dev: {
-		auth_redirect: "https://dev.edvinas.online/auth/callback",
 		socket_server: "wss://socket.edvinas.online",
 	},
 	prod: {
-		auth_redirect: "https://journal.edvinas.online/auth/callback",
 		socket_server: 'wss://socket.edvinasmomkus.workers.dev'
 	}
 }
@@ -25,7 +23,6 @@ const developement = Astro.locals.runtime.env.DEV === 'true'
 export const prerender = false;
 
 const urls = fetch_urls[developement? "dev" : "prod"];
-
 
 ---
 <AppLayout>

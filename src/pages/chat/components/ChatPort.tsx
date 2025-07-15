@@ -1,8 +1,10 @@
 import { $invite_modal, withRoomMessages } from "@script/stores";
-import { createFormAction } from "@root/src/script/Form";
+import { createFormAction } from "@script/Form";
 import { Messages } from "@ui/components/MessageSection";
 import { WritingArea } from "@ui/components/Chat";
 import { RightPannelLayout } from "@ui/layouts/SidePannel";
+import MembersView from "@ui/views/Members";
+
 
 
 export default function ChatRoomPort() {
@@ -61,7 +63,6 @@ export default function ChatRoomPort() {
 
 import { useRef, useEffect  } from "preact/hooks";
 import type { ComponentChild } from "preact";
-import MembersView from "@root/src/ui/views/Members";
 import { Button, Center } from "@root/src/ui/components/Material";
 
 interface ScrollBottomContainerProps {

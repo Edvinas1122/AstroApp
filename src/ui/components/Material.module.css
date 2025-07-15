@@ -26,7 +26,7 @@
     margin: 16px;
     display: flex;
     flex-direction: column;
-	font-family: Helvetica, sans-serif;
+	  font-family: Helvetica, sans-serif;
 }
 
 .card:hover {
@@ -223,7 +223,9 @@
   cursor: pointer;
   transform: translateY(0px);
   transition: transform 0.2s;
-  overflow:visible;
+  overflow: visible;
+  text-decoration: none;   /* removes underline */
+  color: inherit;  
 }
 
 .tablet:hover {

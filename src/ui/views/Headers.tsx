@@ -13,7 +13,9 @@ export default function Headers() {
                     Chat
                 </nav>
             </OptionsTablet>
-            <OptionsTablet>
+            <OptionsTablet
+                href={"/profile"}
+            >
                 <nav>
                     Profile
                 </nav>

@@ -142,7 +142,7 @@ export const Button = ({children, ...props}: CircleButtonProps) =>
 // 		{children}
 // 	</button>
 
-interface RoomTabletProps extends JSX.HTMLAttributes<HTMLDivElement> {
+interface RoomTabletProps extends JSX.HTMLAttributes<HTMLAnchorElement> {
 	children: ComponentChild,
 	interf?: VNode,
 	selected?: boolean
@@ -175,7 +175,7 @@ export function OptionsTablet({
 	}
 
 	return (
-		<div {...props}
+		<a {...props}
 			class={`${style.tablet} ${selected && style.selected}`}
 		>
 			{children}
@@ -191,7 +191,7 @@ export function OptionsTablet({
 			>
 			{interf}
 			</div>}</>}
-		</div>
+		</a>
 	)
 }
 

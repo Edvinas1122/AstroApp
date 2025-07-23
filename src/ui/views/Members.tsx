@@ -17,7 +17,9 @@ export default function MembersView({
     const participants = members.filter(memb => memb.role === 'participant');
     const invited = members.filter(memb => memb.role === 'invited');
 
-    const buidRenderMember = (interact: (role: Member['role']) => VNode | undefined) => (item: Member) => <OptionsTablet
+    const buidRenderMember = (
+        interact: (role: Member['role']) => VNode | undefined
+    ) => (item: Member) => <OptionsTablet
         interf={interact(item.role)}
         selected={false}
     ><ChatUserMini 

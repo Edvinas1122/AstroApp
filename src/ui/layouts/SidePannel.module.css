@@ -39,6 +39,7 @@
 .center {
   display: flex;
   flex-direction: column;
+  position: relative;
   /* max-width: 500px; */
   /* padding: 1rem; */
   /* padding: 5%; */

@@ -29,7 +29,6 @@ export default function ChatList() {
 						<p>
 							<>{item.name}</>
 						</p>
-						{/* {interact(id)} */}
 					</>
 			</OptionsTablet>
 	}

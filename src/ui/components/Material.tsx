@@ -1,7 +1,7 @@
 import { h } from 'preact';
 import style from './Material.module.css';
 import { useRef, useEffect, useState } from 'preact/hooks';
-import type { ComponentChild, JSX, VNode } from 'preact';
+import type { ComponentChild, ComponentChildren, JSX, VNode } from 'preact';
 
 interface CardProps {
     header?: preact.ComponentChildren;
@@ -23,17 +23,17 @@ export function Card({
             class={`${style.card} ${className}`}
             style={{ maxWidth: width }}
         >
-            {header && <div class={style.cardHeader}>
+            {header && <header class={style.cardHeader}>
                 {header}
-            </div>}
+            </header>}
             
-            <div class={style.cardContent}>
+            <main class={style.cardContent}>
                 {children}
-            </div>
+            </main>
             
-            {footer && <div class={style.cardFooter}>
+            {footer && <footer class={style.cardFooter}>
                 {footer}
-            </div>}
+            </footer>}
         </section>
     );
 }
@@ -124,26 +124,28 @@ export const Profile = ({...props}: ProfileProps) => (
 	/>
 )
 
-interface CircleButtonProps extends JSX.HTMLAttributes<HTMLButtonElement> {
-	children: VNode,
+interface ButtonProps extends JSX.HTMLAttributes<HTMLButtonElement> {
+	children?: ComponentChildren,
+	disabled?: boolean,
+	type?: "button" | "reset" | "submit"
 } 
 
-export const Button = ({children, ...props}: CircleButtonProps) =>
+export const Button = ({children, ...props}: ButtonProps) =>
 	<button {...props} class={style.button}>
 		{children}
 	</button>
 
-// interface CircleButtonProps extends JSX.HTMLAttributes<HTMLButtonElement> {
-// 	children: VNode,
-// } 
+interface CircleButtonProps extends JSX.HTMLAttributes<HTMLButtonElement> {
+	children: ComponentChildren,
+} 
 
-// export const CircleButton = ({children, ...props}: CircleButtonProps) =>
-// 	<button {...props} class={style.circleBtn}>
-// 		{children}
-// 	</button>
+export const CircleButton = ({children, ...props}: CircleButtonProps) =>
+	<button {...props} class={style.circleBtn}>
+		{children}
+	</button>
 
 interface RoomTabletProps extends JSX.HTMLAttributes<HTMLAnchorElement> {
-	children: ComponentChild,
+	children: ComponentChildren,
 	interf?: VNode,
 	selected?: boolean
 }

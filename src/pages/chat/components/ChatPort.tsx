@@ -7,7 +7,9 @@ import MembersView from "@ui/views/Members";
 
 
 
-export default function ChatRoomPort() {
+export default function ChatRoomPort({
+    membersPort
+}: {membersPort?: ComponentChildren}) {
     const data = withRoomMessages();
 
     if (data.status === "not ready") {
@@ -36,7 +38,7 @@ export default function ChatRoomPort() {
 				<MembersView
 					members={data.members}
 					/>
-                <Button onClick={() => $invite_modal.set(true)}><>Invite</></Button>
+                <Button disabled={false} onClick={() => $invite_modal.set(true)}><>Invite</></Button>
 				</>
 			}
 		>
@@ -57,12 +59,13 @@ export default function ChatRoomPort() {
             submit={submit.form}
             />
         </div>
+        {membersPort}
         </RightPannelLayout>
     )
 }
 
 import { useRef, useEffect  } from "preact/hooks";
-import type { ComponentChild } from "preact";
+import type { ComponentChild, ComponentChildren } from "preact";
 import { Button, Center } from "@root/src/ui/components/Material";
 
 interface ScrollBottomContainerProps {

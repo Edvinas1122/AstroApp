@@ -15,9 +15,7 @@ export default function TopBarLayout({
             <header class={styles.header_bar}>
                 {header}
             </header>
-            <>
-                {children}
-            </>
+            {children}
         </>
     )
 }

@@ -88,7 +88,7 @@ class PageStore<T> extends PageStoreMap<T> {
         super(initialData);
     }
 
-    fetch(id: string) {
+    async fetch(id: string) {
         return this.pages.with(id, async () => {
             // Set loading state to true
             const current = this.$store.get()[id] || Object.assign([], { loading: false });

@@ -1,0 +1,59 @@
+:root {
+    --gradient-sunset: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+    --gradient-ocean: linear-gradient(135deg, #2193b0, #6dd5ed);
+    --gradient-mint: linear-gradient(135deg, #a8edea, #fed6e3);
+    --gradient-flame: linear-gradient(135deg, #ff6a00, #ee0979);
+    --gradient-night: linear-gradient(135deg, #141e30, #243b55);
+
+    /* Complimentary dark colors */
+    --dark-sunset: #712b2b;   /* muted deep rose */
+    --dark-ocean:  #1a2b38;   /* deep blue-gray */
+    --dark-mint:   #324248;   /* soft charcoal green */
+    --dark-flame:  #3d1f10;   /* deep ember */
+    --dark-night:  #0d1117;   /* near-black blue */
+
+        /* Complimentary light colors */
+    --light-sunset: #ffe9ec;   /* pale blush */
+    --light-ocean:  #e3f4fb;   /* light aqua-blue */
+    --light-mint:   #f3fdfa;   /* airy mint cream */
+    --light-flame:  #ffe3cc;   /* warm light peach */
+    --light-night:  #e0e4f0;   /* soft grayish blue */
+}
+
+.profileCard {
+    position: absolute;
+    right: 0;
+}
+
+.profileCard header {
+    background: var(--gradient-ocean);
+}
+
+.user p {
+    color: white;
+    /* display: flex; */
+    animation: textShadowBlink 2s ease-in-out;
+}
+
+.profileCard button {
+    /* color: var(--dark-ocean); */
+    color: white;
+    border-radius: 15px;
+    font-size: smaller;
+    /* font-weight: ; */
+    background: var(--dark-ocean);
+}
+
+.profileCard button:hover {
+    color: var(--dark-ocean);
+    background: var(--light-ocean);
+}
+
+@keyframes textShadowBlink {
+    0%, 100% {
+        text-shadow: 0 1px 5px rgba(255, 255, 255, 0); /* Invisible */
+    }
+    50% {
+        text-shadow: 0 1px 5px rgba(255, 255, 255, 1); /* Fully visible */
+    }
+}

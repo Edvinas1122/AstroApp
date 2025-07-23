@@ -8,6 +8,7 @@ import { SidePannelLayout } from "@root/src/ui/layouts/SidePannel";
 import TopBarLayout from "@root/src/ui/layouts/TopBar";
 import ChatRoomPort from "./components/ChatPort";
 import Headers from "@ui/views/Headers"
+import { ProfileView } from "@root/src/ui/views/Profile";
 
 const fetch_urls = {
 	dev: {
@@ -57,9 +58,15 @@ const urls = fetch_urls[developement? "dev" : "prod"];
 						<slot slot="header">
 							<Headers/>
 						</slot>
-						<ChatRoomPort
+					<ChatRoomPort
+						client:load
+					>
+						<slot slot="membersPort">
+						<ProfileView
 							client:load
 						/>
+						</slot>
+					</ChatRoomPort>
 					</TopBarLayout>
 				</SidePannelLayout>
 			<div>

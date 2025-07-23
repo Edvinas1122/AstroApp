@@ -229,6 +229,7 @@ export const chats = new ChatStore({},
 
 export const route = atom<string[] | null>(null);
 export const my_email = atom<string | null>(null);
+export const hoverMember = atom<string | null>(null);
 
 
 import { useStore } from "@nanostores/preact";
@@ -287,8 +288,9 @@ export function withRoomMessages(): RoomMessagesResult {
 
 	useEffect(() => {
 		if (!id || !email) return;
-		messages.fetch(id);
-		members.fetch(id);
+		members.fetch(id).then(() => {
+			messages.fetch(id);
+		})
 	}, [id, email]);
 
 	if (!c_route || !email) {
